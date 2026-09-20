@@ -2,7 +2,7 @@
 
 A Filipino recipe book that turns dishes into a shared grocery checklist you tick off in the palengke.
 
-Status: **planning**. No code yet. All decisions below are the captain's calls of 2026-09-20.
+Status: **planning**. No code yet. Decisions below were settled 2026-09-20.
 
 ---
 
@@ -61,7 +61,7 @@ TheMealDB goes in as an explicit **"Search more recipes"** button from M2, not a
 
 | Layer | Choice | Why |
 |---|---|---|
-| App | Expo (React Native) | Same stack as taiwan-expenses — no new tooling to learn, real app on both phones |
+| App | Expo (React Native) | Stack already familiar here — no new tooling to learn, real app on both phones |
 | Backend | Supabase | Two people need to see each other's ticks; Realtime gives that without writing a server |
 | Recipes | Bundled `recipes.json` | Offline core. Not in Supabase — the market is where signal dies |
 | List state | Supabase, cached locally | Syncs between phones, survives no signal |
