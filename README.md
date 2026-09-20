@@ -45,13 +45,24 @@ Four of the eight are eggplant. And:
 
 Has a `cuisine=Filipino` filter and good ingredient parsing, but needs an API key, the free tier is ~150 points/day, and its Filipino results are mostly Western food-blog approximations.
 
-### Decision: bundled `recipes.json`, plus TheMealDB as a search button
+### Decision: scrape and curate at build time, ship the result
 
-**Both.** `recipes.json` ships inside the app — ~25 dishes written properly with real Filipino ingredient names. That is the offline core, and it is what guarantees sinigang and adobo are correct.
+`recipes.json` ships inside the app and is the offline source of truth. It is **built, not typed**.
 
-TheMealDB goes in as an explicit **"Search more recipes"** button from M2, not as the foundation. It needs signal, so it is clearly marked as online-only and its results are treated as imports into the local set, never as the source of truth.
+Four Filipino recipe sites publish machine-readable `schema.org/Recipe` data, free and without an API key — **1,569 recipes at nestlegoodnes.com/ph**, **~2,739 at Panlasang Pinoy**, 627 at Kawaling Pinoy, 761 at Pepper.ph. The MIT-licensed [`recipe-scrapers`](https://github.com/hhursev/recipe-scrapers/) library reads all four, and has a dedicated Panlasang Pinoy scraper. Sinigang, adobo, kare-kare and adobong kangkong were all pulled live to confirm it, returning ingredient names already written as a Filipino cook writes them — *kangkong*, *gabi*, *bagoong alamang*.
 
-> Pending: a scout is scanning existing recipe-to-list apps and Filipino recipe datasets. If it finds a dataset or scraper that beats hand-writing 25 recipes, this section gets revised before M1 starts.
+The pipeline is a **one-off build-time script**. It never ships in the app and the app never calls it at runtime:
+
+```
+sitemaps → filter to wanted dishes → recipe-scrapers (wild_mode)
+        → {name, servings, ingredients[]}
+        → HAND-TAG the aisle field          ← the irreducible human work
+        → commit recipes.json
+```
+
+**Only ingredient lists and dish names are taken** — not the prose, not the photos, not the instructions. US Copyright Office Circular 33 states plainly that *"a mere listing of ingredients or contents … is uncopyrightable"*, which is exactly and only the part a grocery list needs. Sources get credited in the app's About screen.
+
+TheMealDB stays as an explicit **"Search more recipes"** button from M2 — online-only, clearly marked, results imported into the local set, never the source of truth.
 
 ---
 
@@ -132,6 +143,22 @@ Two recipes both need garlic → one line, not two.
 
 No unit-conversion engine. Nobody needs the app to know that 16 tbsp is a cup; a person reading "1 cup + 2 tbsp toyo" buys the right bottle.
 
+### The synonym map is the merge key
+
+This is the one thing no competitor does, and it only matters because the recipes are scraped from several sites that name things differently.
+
+One scraped recipe says `tamarind`. Another says `sampalok mix`. A third says `sampaloc`. Those are **one purchase**, and every existing app puts them on three separate lines because it has no idea they are related.
+
+```json
+{ "sampalok": ["tamarind", "sampaloc", "tamarind mix", "sampalok mix"],
+  "gabi":     ["taro", "taro root"],
+  "kangkong": ["water spinach", "ong choy", "onchoy"],
+  "patis":    ["fish sauce"],
+  "toyo":     ["soy sauce"] }
+```
+
+Merging resolves each ingredient to its canonical Filipino name **before** comparing, so the three spellings above collapse to one `sampalok` line. The map is display text *and* merge key — building it as only the former is the mistake to avoid.
+
 ---
 
 ## 7. Milestones
@@ -139,10 +166,11 @@ No unit-conversion engine. Nobody needs the app to know that 16 tbsp is a cup; a
 | # | Deliverable |
 |---|-------------|
 | M0 | Folder, git repo, this README. ✅ |
-| M1 | `recipes.json` — **the full catalogue of famous Filipino dishes**, Filipino-first naming |
+| M1 | Build-time scraper script + ~200 scraped recipes ingested to `recipes.json`, Filipino-first naming |
 | M2 | Expo app: browse, select, merged checklist. Supabase schema, magic-link invites, local-first ticking. TheMealDB "Search more" button |
 | M3 | Realtime sync between two phones, OR-merge on `checked`, offline queue and flush |
-| M4 | Archive + trip history, re-run a past list |
+| M4 | **Aisle-tagging pass** over the full catalogue + synonym map |
+| M5 | Archive + trip history, re-run a past list |
 | Later | Scale by servings, pantry ("already have it"), recipe photos, cooking steps |
 
 ### M1 scope: "all the famous dishes in the Philippines"
@@ -159,7 +187,7 @@ Not 10 — the whole catalogue, roughly 90-110 dishes, grouped so the app can br
 | **Pulutan at meryenda** | lumpiang shanghai, lumpiang sariwa, tokwa't baboy, calamares, kwek-kwek, okoy, chicharon, isaw, turon, banana cue, camote cue |
 | **Panghimagas** | leche flan, halo-halo, bibingka, puto bumbong, puto, kutsinta, sapin-sapin, biko, maja blanca, ginataang bilo-bilo, buko pandan, ube halaya, brazo de mercedes, sans rival, ensaymada, yema, pastillas, polvoron |
 
-**This is a much bigger content job than 10 recipes** — roughly 700-1,000 individual ingredient lines, each needing a correct Filipino name, a quantity, and an aisle. It makes the pending dataset question decisive: writing that by hand is days of work, importing and checking it is hours.
+Roughly 700-1,000 individual ingredient lines. **Scraped, not typed** — the names and quantities come from the four sources above. What stays human is tagging each ingredient's palengke section and curating the synonym map, which is where the effort belongs because it is the part nothing else on the market has.
 
 ---
 
@@ -171,7 +199,19 @@ Each is a real feature. None is needed to walk into a market with a correct list
 
 ---
 
-## 9. Open questions
+## 9. Where this stands against what already exists
 
-1. **Where does the recipe content come from at this scale?** ~100 dishes is days of hand-writing. Held pending the competitor and dataset scan — see section 2.
-2. **Does browsing need categories in the UI from M2?** With ~100 dishes, a flat searchable list may be enough, or the categories above may need to be real navigation.
+Worth being plain about: **merging ingredients, aisle grouping, and offline are solved, commodity features.** Paprika Recipe Manager 3 does all three for a one-time $4.99 on five platforms; Plan to Eat, AnyList and Recipe Keeper are equivalent. This project does not compete on those.
+
+What does not exist anywhere:
+
+1. **Filipino dishes pre-tagged to palengke sections.** Every aisle-grouping app maps to Western supermarket categories. None knows bagoong and patis share a dry-goods stall, or that a palengke has an isda section.
+2. **Filipino ingredient vocabulary as the merge key.** Nothing on the market collapses `sampalok` and `tamarind` into one purchase.
+3. **A Filipino recipe app with an aisle-grouped merged list.** The nearest, *Panlasang Pinoy Meaty Recipes*, groups its list **by recipe name** — three recipes means walking the market three times, the exact failure this fixes.
+4. **Zero-setup.** Paprika is offline *after* you clip 25 recipes by hand, one at a time. This ships with the sinigang already in it, already tagged.
+
+Honest counterweight: 1 and 2 are a *data* advantage, not a software one — anyone could hand-add Filipino aisles to Paprika. The moat is thin. What makes it worth building is that it arrives pre-loaded.
+
+## 10. Open questions
+
+1. **Does browsing need categories in the UI from M2?** With ~200 recipes, a flat searchable list may not be enough and the categories above may need to be real navigation.
