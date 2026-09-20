@@ -76,15 +76,24 @@ These two requirements fight each other, so the rule is explicit:
 - **Sync on reconnect.** Queued ticks flush to Supabase when signal returns; Realtime pushes the other person's ticks in.
 - **Conflicts resolve by OR, not by clock.** If *either* person checked an item, it is checked. You cannot un-buy something by having a slower phone. This makes conflict resolution one line and rules out ever needing a CRDT library.
 
+### Joining a list
+
+**Supabase magic-link email invite.** You create the list, send her an email link, she taps it and she's on it. Real Supabase auth, no passwords to remember.
+
+### After shopping
+
+**The list archives and the history is kept.** You can look back at what you bought and when, and re-run a past trip as the basis for a new one.
+
 ### Tables
 
 ```
-lists        id, name, created_at
-list_items   id, list_id, item, qty, unit, aisle, checked, checked_by
-list_members id, list_id, user_id
+lists        id, name, created_at, archived_at
+list_items   id, list_id, item, qty, unit, aisle, checked, checked_by, checked_at
+list_members id, list_id, user_id, role
+invites      id, list_id, email, token, accepted_at
 ```
 
-`checked` is a boolean that only ever goes false→true during a shopping trip. Clearing the list is an explicit action, not a sync outcome.
+`checked` is a boolean that only ever goes false→true during a shopping trip. Archiving is an explicit action, not a sync outcome.
 
 ---
 
@@ -130,13 +139,27 @@ No unit-conversion engine. Nobody needs the app to know that 16 tbsp is a cup; a
 | # | Deliverable |
 |---|-------------|
 | M0 | Folder, git repo, this README. ✅ |
-| M1 | `recipes.json` — 10 dishes, sinigang and adobo included, Filipino-first naming |
-| M2 | Expo app: browse, select, merged checklist. Supabase schema + local-first ticking. TheMealDB "Search more" button |
+| M1 | `recipes.json` — **the full catalogue of famous Filipino dishes**, Filipino-first naming |
+| M2 | Expo app: browse, select, merged checklist. Supabase schema, magic-link invites, local-first ticking. TheMealDB "Search more" button |
 | M3 | Realtime sync between two phones, OR-merge on `checked`, offline queue and flush |
-| M4 | Fill out to ~25 recipes |
+| M4 | Archive + trip history, re-run a past list |
 | Later | Scale by servings, pantry ("already have it"), recipe photos, cooking steps |
 
-**First 10 dishes** (captain left the pick to me): sinigang na baboy, chicken adobo, kare-kare, tinola, bulalo, menudo, afritada, pancit bihon, ginataang gulay, tortang talong.
+### M1 scope: "all the famous dishes in the Philippines"
+
+Not 10 — the whole catalogue, roughly 90-110 dishes, grouped so the app can browse by category:
+
+| Category | Examples |
+|---|---|
+| **Ulam — karne** | adobong manok/baboy, kaldereta, mechado, afritada, menudo, pochero, bistek tagalog, dinuguan, sisig, lechon kawali, crispy pata, humba, hamonado, tapa, tocino, longganisa, embutido, morcon, bopis, igado |
+| **Ulam — isda at pagkaing-dagat** | sinigang na hipon/bangus, rellenong bangus, daing na bangus, paksiw na isda, escabeche, adobong pusit, kinilaw, sinigang na sugpo, ginataang tilapia |
+| **Sabaw** | sinigang na baboy, bulalo, nilagang baka, tinolang manok, sopas, la paz batchoy, molo, goto, arroz caldo, papaitan |
+| **Gulay** | pinakbet, laing, chopsuey, ginataang gulay, ginisang monggo, adobong kangkong, ampalaya con carne, tortang talong, bicol express, binagoongan |
+| **Pancit at kanin** | pancit canton, bihon, palabok, malabon, habhab, sotanghon, lomi, mami, bringhe, paella filipina, sinangag |
+| **Pulutan at meryenda** | lumpiang shanghai, lumpiang sariwa, tokwa't baboy, calamares, kwek-kwek, okoy, chicharon, isaw, turon, banana cue, camote cue |
+| **Panghimagas** | leche flan, halo-halo, bibingka, puto bumbong, puto, kutsinta, sapin-sapin, biko, maja blanca, ginataang bilo-bilo, buko pandan, ube halaya, brazo de mercedes, sans rival, ensaymada, yema, pastillas, polvoron |
+
+**This is a much bigger content job than 10 recipes** — roughly 700-1,000 individual ingredient lines, each needing a correct Filipino name, a quantity, and an aisle. It makes the pending dataset question decisive: writing that by hand is days of work, importing and checking it is hours.
 
 ---
 
@@ -150,5 +173,5 @@ Each is a real feature. None is needed to walk into a market with a correct list
 
 ## 9. Open questions
 
-1. **How do two people end up on the same list?** A shared household code you type once, a Supabase magic-link invite, or full email/password accounts. This blocks M2 — the schema above assumes `list_members` but not how a row gets there.
-2. **What happens after shopping?** Does the list clear, archive, or stay ticked until the next cook plan? Affects whether `lists` needs a lifecycle column.
+1. **Where does the recipe content come from at this scale?** ~100 dishes is days of hand-writing. Held pending the competitor and dataset scan — see section 2.
+2. **Does browsing need categories in the UI from M2?** With ~100 dishes, a flat searchable list may be enough, or the categories above may need to be real navigation.
