@@ -1,8 +1,8 @@
 # recipe-app
 
-A Filipino recipe book that turns dishes into a grocery checklist you can tick off in the palengke.
+A Filipino recipe book that turns dishes into a shared grocery checklist you tick off in the palengke.
 
-Status: **planning only**. No code yet.
+Status: **planning**. No code yet. All decisions below are the captain's calls of 2026-09-20.
 
 ---
 
@@ -11,7 +11,7 @@ Status: **planning only**. No code yet.
 1. You search or browse Filipino dishes (sinigang, adobo, kare-kare, ...).
 2. You tap the ones you want to cook this week.
 3. The app merges all their ingredients into one shopping list, grouped by where you walk in the market (gulay, karne, isda, dry goods).
-4. You check items off while shopping. The list survives closing the app.
+4. **Both of you** check items off, on your own phones, at the same time, and each sees the other's ticks.
 
 That is the whole product. Everything else is later.
 
@@ -41,26 +41,54 @@ Four of the eight are eggplant. And:
 - `search.php?s=sinigang` → `{"meals":null}` — **sinigang is not in it**
 - there is no chicken adobo or pork adobo, only *eggplant* adobo
 
-The headline dish in the request does not exist in the free API. This is a dead end on its own.
-
 ### Spoonacular
 
-Has a `cuisine=Filipino` filter and good ingredient parsing, but: needs an API key, free tier is ~150 points/day (a handful of searches), and its Filipino results are mostly Western food-blog approximations. It also costs money the moment this is used daily.
+Has a `cuisine=Filipino` filter and good ingredient parsing, but needs an API key, the free tier is ~150 points/day, and its Filipino results are mostly Western food-blog approximations.
 
-### Decision: ship a local recipe file
+### Decision: bundled `recipes.json`, plus TheMealDB as a search button
 
-`recipes.json` in the repo, ~25 dishes written properly with real Filipino ingredient names (sampalok, patis, gabi, bagoong). Reasons:
+**Both.** `recipes.json` ships inside the app — ~25 dishes written properly with real Filipino ingredient names. That is the offline core, and it is what guarantees sinigang and adobo are correct.
 
-- sinigang and adobo actually exist in it
-- ingredients are correct, not a blogger's guess
-- **no API key, no rate limit, no network** — the market is exactly where signal dies
-- adding a recipe is editing one JSON file
+TheMealDB goes in as an explicit **"Search more recipes"** button from M2, not as the foundation. It needs signal, so it is clearly marked as online-only and its results are treated as imports into the local set, never as the source of truth.
 
-TheMealDB can be bolted on later as an optional "search more recipes" button. It is not needed to ship.
+> Pending: a scout is scanning existing recipe-to-list apps and Filipino recipe datasets. If it finds a dataset or scraper that beats hand-writing 25 recipes, this section gets revised before M1 starts.
 
 ---
 
-## 3. Data shape
+## 3. Stack
+
+**Expo / React Native + Supabase.**
+
+| Layer | Choice | Why |
+|---|---|---|
+| App | Expo (React Native) | Same stack as taiwan-expenses — no new tooling to learn, real app on both phones |
+| Backend | Supabase | Two people need to see each other's ticks; Realtime gives that without writing a server |
+| Recipes | Bundled `recipes.json` | Offline core. Not in Supabase — the market is where signal dies |
+| List state | Supabase, cached locally | Syncs between phones, survives no signal |
+
+---
+
+## 4. Two phones, one list, no signal
+
+These two requirements fight each other, so the rule is explicit:
+
+- **Local-first.** Every tick writes to the phone immediately and shows immediately. The market is exactly where signal dies; the app must never wait on the network to check off an onion.
+- **Sync on reconnect.** Queued ticks flush to Supabase when signal returns; Realtime pushes the other person's ticks in.
+- **Conflicts resolve by OR, not by clock.** If *either* person checked an item, it is checked. You cannot un-buy something by having a slower phone. This makes conflict resolution one line and rules out ever needing a CRDT library.
+
+### Tables
+
+```
+lists        id, name, created_at
+list_items   id, list_id, item, qty, unit, aisle, checked, checked_by
+list_members id, list_id, user_id
+```
+
+`checked` is a boolean that only ever goes false→true during a shopping trip. Clearing the list is an explicit action, not a sync outcome.
+
+---
+
+## 5. Data shape
 
 ```json
 {
@@ -69,68 +97,58 @@ TheMealDB can be bolted on later as an optional "search more recipes" button. It
   "alt": ["pork sinigang", "sour pork soup"],
   "servings": 4,
   "ingredients": [
-    { "item": "pork belly (liempo)", "qty": 1,   "unit": "kg",  "aisle": "karne" },
-    { "item": "sampalok mix",        "qty": 1,   "unit": "pack","aisle": "dry" },
-    { "item": "gabi",                "qty": 250, "unit": "g",   "aisle": "gulay" },
-    { "item": "kangkong",            "qty": 1,   "unit": "bunch","aisle": "gulay" },
-    { "item": "patis",               "qty": 2,   "unit": "tbsp","aisle": "dry" }
+    { "item": "liempo (pork belly)", "qty": 1,   "unit": "kg",    "aisle": "karne" },
+    { "item": "sampalok (tamarind) mix", "qty": 1, "unit": "pack", "aisle": "dry goods" },
+    { "item": "gabi (taro)",        "qty": 250, "unit": "g",     "aisle": "gulay" },
+    { "item": "kangkong",           "qty": 1,   "unit": "bunch", "aisle": "gulay" },
+    { "item": "patis (fish sauce)", "qty": 2,   "unit": "tbsp",  "aisle": "dry goods" }
   ]
 }
 ```
 
-`aisle` is the one field that earns its place — it is what makes the list walkable instead of random.
+**Naming: Filipino first, English in brackets** — `sampalok (tamarind)`, `gabi (taro)`, `patis (fish sauce)`. Where there is no useful English word (kangkong, bagoong), the Filipino name stands alone.
 
-Cooking steps are optional and can be added per recipe later. The grocery list does not need them.
+**Aisles are Filipino:** `gulay` · `karne` · `isda` · `dry goods`. These are the section headers on the shopping list.
+
+Cooking steps are optional per recipe and can come later. The grocery list does not need them.
 
 ---
 
-## 4. Merging rules
+## 6. Merging rules
 
 Two recipes both need garlic → one line, not two.
 
 - same item + same unit → add the quantities (`3 cloves` + `5 cloves` = `8 cloves`)
-- same item + different units → show both (`1 cup + 2 tbsp soy sauce`)
+- same item + different units → show both (`1 cup + 2 tbsp toyo`)
 
-No unit-conversion engine. Nobody needs the app to know that 16 tbsp is a cup; a person reading "1 cup + 2 tbsp soy sauce" buys the right bottle.
-
----
-
-## 5. Stack
-
-Single `index.html` — plain HTML, CSS, a bit of JS, `recipes.json` beside it, checked state in `localStorage`.
-
-- no build step, no npm install, no deploy pipeline
-- open it on the phone, Add to Home Screen, it behaves like an app
-- works offline, which is the actual requirement in a market
-
-Move to Vite + React only when the single file genuinely hurts — probably around the point we want recipe editing or multiple saved lists.
+No unit-conversion engine. Nobody needs the app to know that 16 tbsp is a cup; a person reading "1 cup + 2 tbsp toyo" buys the right bottle.
 
 ---
 
-## 6. Milestones
+## 7. Milestones
 
 | # | Deliverable |
 |---|-------------|
-| M0 | This README. ✅ |
-| M1 | `recipes.json` with 10 dishes, sinigang and adobo included |
-| M2 | `index.html`: browse, select, merged checklist, saved state |
-| M3 | Aisle grouping + quantity merging |
+| M0 | Folder, git repo, this README. ✅ |
+| M1 | `recipes.json` — 10 dishes, sinigang and adobo included, Filipino-first naming |
+| M2 | Expo app: browse, select, merged checklist. Supabase schema + local-first ticking. TheMealDB "Search more" button |
+| M3 | Realtime sync between two phones, OR-merge on `checked`, offline queue and flush |
 | M4 | Fill out to ~25 recipes |
-| Later | TheMealDB "search more", share list, scale by servings, pantry ("already have it") |
+| Later | Scale by servings, pantry ("already have it"), recipe photos, cooking steps |
+
+**First 10 dishes** (captain left the pick to me): sinigang na baboy, chicken adobo, kare-kare, tinola, bulalo, menudo, afritada, pancit bihon, ginataang gulay, tortang talong.
 
 ---
 
-## 7. Deliberately not in v1
+## 8. Deliberately not in v1
 
-Accounts, cloud sync, price tracking, barcode scanning, meal-plan calendar, nutrition info, photos, recipe editing in-app, serving-size scaling.
+Price tracking · barcode scanning · meal-plan calendar · nutrition info · in-app recipe editing · serving-size scaling.
 
-Each of these is a real feature. None of them is needed to walk into a market with a correct list.
+Each is a real feature. None is needed to walk into a market with a correct list.
 
 ---
 
-## 8. Open questions
+## 9. Open questions
 
-1. **Recipe count and picks** — is ~25 right, and which dishes go in the first 10?
-2. **Language** — Filipino ingredient name first with English in brackets (`sampalok (tamarind)`), or the reverse?
-3. **Aisle names** — Filipino (`gulay / karne / isda / dry`) or English (`produce / meat / seafood / pantry`)?
-4. **Shared list** — will two people shop from the same list at once? That is the one thing that would force a backend, so it is worth answering before M2.
+1. **How do two people end up on the same list?** A shared household code you type once, a Supabase magic-link invite, or full email/password accounts. This blocks M2 — the schema above assumes `list_members` but not how a row gets there.
+2. **What happens after shopping?** Does the list clear, archive, or stay ticked until the next cook plan? Affects whether `lists` needs a lifecycle column.
