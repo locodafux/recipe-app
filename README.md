@@ -10,7 +10,7 @@ Status: **planning**. No code yet. Decisions below were settled 2026-09-20.
 
 1. You search or browse Filipino dishes (sinigang, adobo, kare-kare, ...).
 2. You tap the ones you want to cook this week.
-3. The app merges all their ingredients into one shopping list, grouped by where you walk in the market (gulay, karne, isda, dry goods).
+3. The app merges all their ingredients into one shopping list, grouped by where you walk in the market (Vegetables, Dry goods, Fish & seafood, Meat).
 4. **Both of you** check items off, on your own phones, at the same time, and each sees the other's ticks.
 
 That is the whole product. Everything else is later.
@@ -117,18 +117,30 @@ invites      id, list_id, email, token, accepted_at
   "alt": ["pork sinigang", "sour pork soup"],
   "servings": 4,
   "ingredients": [
-    { "item": "liempo (pork belly)", "qty": 1,   "unit": "kg",    "aisle": "karne" },
-    { "item": "sampalok (tamarind) mix", "qty": 1, "unit": "pack", "aisle": "dry goods" },
-    { "item": "gabi (taro)",        "qty": 250, "unit": "g",     "aisle": "gulay" },
-    { "item": "kangkong",           "qty": 1,   "unit": "bunch", "aisle": "gulay" },
-    { "item": "patis (fish sauce)", "qty": 2,   "unit": "tbsp",  "aisle": "dry goods" }
+    { "item": "liempo (pork belly)", "label": "pork belly", "qty": 1,   "unit": "kg",    "aisle": "karne" },
+    { "item": "sampalok (tamarind)", "label": "tamarind",   "qty": 1,   "unit": "pack",  "aisle": "dry goods" },
+    { "item": "gabi (taro)",         "label": "taro",       "qty": 250, "unit": "g",     "aisle": "gulay" },
+    { "item": "kangkong",            "label": "kangkong",   "qty": 1,   "unit": "bunch", "aisle": "gulay" },
+    { "item": "patis (fish sauce)",  "label": "fish sauce", "qty": 2,   "unit": "tbsp",  "aisle": "dry goods" }
   ]
 }
 ```
 
-**Naming: Filipino first, English in brackets** — `sampalok (tamarind)`, `gabi (taro)`, `patis (fish sauce)`. Where there is no useful English word (kangkong, bagoong), the Filipino name stands alone.
+**The UI is English; the data keys stay Filipino.** Every ingredient line carries `label`, its English display name (`tamarind`, `taro`, `fish sauce`), and that is what the app shows. Where there is no useful English word — kangkong, bagoong alamang, okra — the label is the Filipino name. Dish names stay as they are (Sinigang na Baboy). `item` keeps the Filipino-first name with English in brackets, and the canonical Filipino names in `synonyms.json` remain the merge key (section 6); neither is display text.
 
-**Aisles are Filipino:** `gulay` · `karne` · `isda` · `dry goods`. These are the section headers on the shopping list.
+**Aisle and category values are Filipino keys with English labels**, both in the generated `data/labels.json`, which also maps each canonical ingredient to its English label for the merged list:
+
+| Aisle key | Shown as | | Category key | Shown as |
+|---|---|---|---|---|
+| `gulay` | Vegetables | | `ulam na karne` | Meat |
+| `dry goods` | Dry goods | | `ulam na isda` | Seafood |
+| `isda` | Fish & seafood | | `sabaw` | Soups |
+| `karne` | Meat | | `gulay` | Vegetables |
+| | | | `pancit at kanin` | Noodles & rice |
+| | | | `pulutan at meryenda` | Snacks |
+| | | | `panghimagas` | Desserts |
+
+**Aisle order is dry before wet:** Vegetables → Dry goods → Fish & seafood → Meat. These are the section headers on the shopping list, in that order, so the fish and meat go in the bag last. `labels.json` lists aisles and categories in display order.
 
 Cooking steps are optional per recipe and can come later. The grocery list does not need them.
 
@@ -157,7 +169,7 @@ One scraped recipe says `tamarind`. Another says `sampalok mix`. A third says `s
   "toyo":     ["soy sauce"] }
 ```
 
-Merging resolves each ingredient to its canonical Filipino name **before** comparing, so the three spellings above collapse to one `sampalok` line. The map is display text *and* merge key — building it as only the former is the mistake to avoid.
+Merging resolves each ingredient to its canonical Filipino name **before** comparing, so the three spellings above collapse to one `sampalok` line, shown as its English label, *tamarind*. The map is the merge key, never display text — the app looks the label up in `labels.json` by canonical name.
 
 ---
 
@@ -166,7 +178,7 @@ Merging resolves each ingredient to its canonical Filipino name **before** compa
 | # | Deliverable |
 |---|-------------|
 | M0 | Folder, git repo, this README. ✅ |
-| M1 | Build-time scraper script + ~200 scraped recipes ingested to `recipes.json`, Filipino-first naming |
+| M1 | Build-time scraper script + ~200 scraped recipes ingested to `recipes.json`, Filipino merge key, English display labels |
 | M2 | Expo app: browse, select, merged checklist. Supabase schema, magic-link invites, local-first ticking. TheMealDB "Search more" button |
 | M3 | Realtime sync between two phones, OR-merge on `checked`, offline queue and flush |
 | M4 | **Aisle-tagging pass** over the full catalogue + synonym map |
@@ -214,4 +226,4 @@ Honest counterweight: 1 and 2 are a *data* advantage, not a software one — any
 
 ## 10. Open questions
 
-1. **Does browsing need categories in the UI from M2?** With ~200 recipes, a flat searchable list may not be enough and the categories above may need to be real navigation.
+1. ~~**Does browsing need categories in the UI from M2?**~~ Settled: search stays primary, and the seven categories are chips above it that filter the same list.

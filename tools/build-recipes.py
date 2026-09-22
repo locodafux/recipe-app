@@ -25,9 +25,9 @@ import urllib.parse
 import requests
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from dishes import DISHES, OVERRIDES  # noqa: E402
+from dishes import CATEGORIES, DISHES, OVERRIDES  # noqa: E402
 from parse import parse_line       # noqa: E402
-from vocab import VOCAB, AISLE_KEYWORDS, DROP  # noqa: E402
+from vocab import AISLES, AISLE_KEYWORDS, DROP, LABELS, VOCAB  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
@@ -253,8 +253,8 @@ def main():
             aisle = aisle_of(canonical, item)
             if aisle is None:
                 unplaced.add(item)
-            ings.append({"item": display or item, "qty": qty, "unit": unit,
-                         "aisle": aisle})
+            ings.append({"item": display or item, "label": LABELS.get(canonical, item),
+                         "qty": qty, "unit": unit, "aisle": aisle})
         if not ings:
             continue
         recipes.append({"id": r["id"], "name": r["name"], "alt": r["alt"],
@@ -264,6 +264,16 @@ def main():
     (DATA / "recipes.json").write_text(
         json.dumps(recipes, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     total = sum(len(r["ingredients"]) for r in recipes)
+
+    # English display text for the app. Keys are the Filipino values used in
+    # recipes.json and synonyms.json; list order is display order.
+    labels = {
+        "aisles": [{"key": k, "label": v} for k, v in AISLES.items()],
+        "categories": [{"key": k, "label": v} for k, v in CATEGORIES.items()],
+        "ingredients": {c: LABELS[c] for c in synonyms},
+    }
+    (DATA / "labels.json").write_text(
+        json.dumps(labels, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"wrote data/recipes.json ({len(recipes)} recipes, {total} ingredient lines)")
     print(f"aisle unplaced: {len(unplaced)} distinct items "
           f"(aisle=null in the output, for the M4 human pass)")

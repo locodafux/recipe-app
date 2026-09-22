@@ -5,6 +5,18 @@ appear in a candidate URL slug for it to be considered; the least-cluttered
 matching slug wins (see pick_url in build-recipes.py).
 """
 
+# English UI name per category, in browse order (the D1 chips). The Filipino key
+# stays the data value in recipes.json.
+CATEGORIES = {
+    "ulam na karne": "Meat",
+    "ulam na isda": "Seafood",
+    "sabaw": "Soups",
+    "gulay": "Vegetables",
+    "pancit at kanin": "Noodles & rice",
+    "pulutan at meryenda": "Snacks",
+    "panghimagas": "Desserts",
+}
+
 # (id, name, alt[], match_terms[])
 DISHES = {
     "ulam na karne": [
@@ -239,3 +251,4 @@ OVERRIDES = {
     "halo-halo": "https://www.kawalingpinoy.com/halo-halo/",
     "pork-barbecue": "https://panlasangpinoy.com/inihaw-na-baboy/",
 }
+assert list(CATEGORIES) == list(DISHES), "every category needs an English name"
