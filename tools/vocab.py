@@ -15,7 +15,9 @@ actually wrote; see build_synonyms() in build-recipes.py.
 
 Aisles are the palengke sections from README section 5: gulay, karne, isda,
 dry goods. Anything this map cannot place gets aisle=null in the output so the
-M4 human pass can find it -- a wrong guess is worse than an honest blank.
+M4 human pass can find it -- a wrong guess is worse than an honest blank. An
+entry may carry aisle=None on purpose: its spellings still merge, but no section
+is a confident home for it (see the block at the end of VOCAB).
 """
 
 import re
@@ -49,7 +51,7 @@ VOCAB = {
     "kangkong": ("kangkong", G, ["water spinach", "ong choy", "onchoy", "swamp cabbage", "kangkong picked leaves and tender stems"]),
     "gabi": ("gabi (taro)", G, ["taro", "taro root", "taro corms"]),
     "dahon ng gabi": ("dahon ng gabi (taro leaves)", G, ["taro leaves", "dried taro leaves"]),
-    "kalabasa": ("kalabasa (squash)", G, ["squash", "kabocha squash", "pumpkin", "butternut squash"]),
+    "kalabasa": ("kalabasa (squash)", G, ["squash", "kabocha squash", "pumpkin", "butternut squash", "calabasa"]),
     "sayote": ("sayote (chayote)", G, ["chayote", "christophene"]),
     "upo": ("upo (bottle gourd)", G, ["bottle gourd", "opo squash"]),
     "patola": ("patola (sponge gourd)", G, ["sponge gourd", "luffa", "ridge gourd"]),
@@ -70,7 +72,7 @@ VOCAB = {
     "puso ng saging": ("puso ng saging (banana heart)", G, ["banana heart", "banana blossom", "banana blossoms"]),
     "kamias": ("kamias", G, ["bilimbi", "kamias"]),
     "langka": ("langka (jackfruit)", G, ["jackfruit", "green jackfruit", "unripe jackfruit"]),
-    "saging": ("saging (banana)", G, ["banana", "bananas", "saba", "saba banana", "saba bananas", "plantain"]),
+    "saging": ("saging (banana)", G, ["banana", "bananas", "saba", "saba banana", "saba bananas", "plantain", "plantains"]),
     "mangga": ("mangga (mango)", G, ["mango", "mangoes", "ripe mango", "ripe mangoes"]),
     "pinya": ("pinya (pineapple)", G, ["pineapple", "fresh pineapple"]),
     "buko": ("buko (young coconut)", G, ["young coconut", "young coconut meat", "buko strips"]),
@@ -81,11 +83,20 @@ VOCAB = {
     "kalamansi": ("kalamansi (calamansi)", G, ["calamansi", "calamansi juice", "calamondin", "calamansi or lemon", "calamansi or lemon juice", "lemon or calamansi juice"]),
     "lemon": ("lemon", G, ["lemon", "lemons", "lemon juice", "lemon juice or vinegar"]),
     "kabute": ("kabute (mushroom)", G, ["button mushrooms", "mushrooms", "shiitake mushrooms", "straw mushrooms"]),
-    "siling haba": ("siling haba (long green chili)", G, ["long green pepper", "long green chili", "siling panigang", "siling pansigang", "long green pepper siling pansigang", "long green chili siling pansigang", "finger chili", "banana pepper"]),
+    "siling haba": ("siling haba (long green chili)", G, ["long green pepper", "long green chili", "siling panigang", "siling pansigang", "long green pepper siling pansigang", "long green chili siling pansigang", "finger chili", "banana pepper", "finger chilies", "long green peppers"]),
     "siling labuyo": ("siling labuyo (bird's eye chili)", G, ["thai chili", "thai chili pepper", "thai chili peppers", "thai chili peppers stemmed", "birds eye chili", "red chili", "red chilies", "dried chilies", "chili peppers"]),
-    "red bell pepper": ("red bell pepper", G, ["red bell pepper", "red bell peppers"]),
+    "red bell pepper": ("red bell pepper", G, ["red bell pepper", "red bell peppers", "red bellpepper"]),
     "green bell pepper": ("green bell pepper", G, ["green bell pepper", "green bell peppers", "bell pepper", "bell peppers"]),
     "dahon ng sili": ("dahon ng sili (chili leaves)", G, ["chili leaves", "pepper leaves"]),
+    "mustasa": ("mustasa (mustard greens)", G, ["mustard greens", "mustard leaves"]),
+    "saluyot": ("saluyot (jute leaves)", G, ["jute leaves", "saluyot"]),
+    "hilaw na papaya": ("hilaw na papaya (green papaya)", G, ["green papaya", "unripe papaya", "unripe green papaya"]),
+    "cauliflower": ("cauliflower", G, ["cauliflower", "cauliflower florets", "florets of cauliflower"]),
+    "chives": ("chives", G, ["chives"]),
+    "dayap": ("dayap (lime)", G, ["lime", "limes", "key lime"]),
+    "strawberry": ("strawberry", G, ["strawberries", "fresh strawberries", "strawberry"]),
+    "blueberry": ("blueberry", G, ["blueberries", "blueberry"]),
+    "kiwi": ("kiwi", G, ["kiwi", "kiwis", "kiwi fruit"]),
 
     # ---- karne: meat and poultry -------------------------------------------
     "baboy": ("baboy (pork)", K, ["pork", "pork cubes", "pork meat"]),
@@ -101,7 +112,7 @@ VOCAB = {
     "pakpak ng manok": ("pakpak ng manok (chicken wings)", K, ["chicken wings", "chicken wing"]),
     "dibdib ng manok": ("dibdib ng manok (chicken breast)", K, ["chicken breast", "chicken breasts", "boneless chicken breast"]),
     "atay ng manok": ("atay ng manok (chicken liver)", K, ["chicken liver", "chicken livers"]),
-    "baka": ("baka (beef)", K, ["beef", "beef cubes", "beef chuck", "beef brisket", "beef sirloin", "beef round"]),
+    "baka": ("baka (beef)", K, ["beef", "beef cubes", "beef chuck", "beef brisket", "beef sirloin", "beef round", "chuck roast", "top round", "sirloin", "top sirloin", "ribeye steak", "ribeye"]),
     "bulalo": ("bulalo (beef shank)", K, ["beef shank", "beef shanks", "bone marrow", "beef shank with bone marrow"]),
     "buntot ng baka": ("buntot ng baka (oxtail)", K, ["oxtail", "ox tail"]),
     "giniling na baka": ("giniling na baka (ground beef)", K, ["ground beef", "minced beef"]),
@@ -116,6 +127,13 @@ VOCAB = {
     "bacon": ("bacon", K, ["bacon", "bacon strips"]),
     "ham": ("ham (hamon)", K, ["ham", "cooked ham"]),
     "chicharon": ("chicharon (pork cracklings)", K, ["chicharon", "pork cracklings", "pork cracklings chicharon", "pork rinds", "chicharron"]),
+    "tainga ng baboy": ("tainga ng baboy (pig ears)", K, ["pig ears", "pig ear", "pork ears"]),
+    "nguso ng baboy": ("nguso ng baboy (pig snout)", K, ["pig snout", "pork snout"]),
+    "utak ng baboy": ("utak ng baboy (pig brain)", K, ["pig brain", "pork brain"]),
+    "bituka": ("bituka (small intestine)", K, ["pig intestine", "pork intestine", "small intestine", "pig intestines"]),
+    "hog casings": ("hog casings", K, ["hog casings", "sausage casings", "pork casings"]),
+    "ruffle fat": ("ruffle fat", K, ["ruffle fat"]),
+    "pata ng baka": ("pata ng baka (cow trotters)", K, ["cow trotters", "ox feet", "cow feet", "beef trotters"]),
 
     # ---- isda: fish and seafood --------------------------------------------
     "isda": ("isda (fish)", I, ["fish", "fish fillet", "white fish"]),
@@ -139,7 +157,7 @@ VOCAB = {
     # ---- dry goods: sauces, seasonings, grains, canned, baking, dairy -------
     "toyo": ("toyo (soy sauce)", D, ["soy sauce", "light soy sauce", "dark soy sauce"]),
     "patis": ("patis (fish sauce)", D, ["fish sauce", "fish sauce patis"]),
-    "suka": ("suka (vinegar)", D, ["vinegar", "white vinegar", "cane vinegar", "coconut vinegar", "spiced vinegar", "apple cider vinegar"]),
+    "suka": ("suka (vinegar)", D, ["vinegar", "white vinegar", "cane vinegar", "coconut vinegar", "spiced vinegar", "apple cider vinegar", "sukang iloko", "sukang iloco"]),
     "bagoong alamang": ("bagoong alamang", D, ["shrimp paste", "bagoong alamang", "bagoong", "sauteed shrimp paste"]),
     "bagoong isda": ("bagoong isda (fermented fish paste)", D, ["fermented fish paste", "bagoong isda", "anchovy sauce"]),
     "asin": ("asin (salt)", D, ["salt", "rock salt", "iodized salt", "sea salt", "table salt", "kosher salt"]),
@@ -157,7 +175,7 @@ VOCAB = {
     "gawgaw": ("gawgaw (cornstarch)", D, ["cornstarch", "corn starch", "corn flour"]),
     "gata": ("gata (coconut milk)", D, ["coconut milk", "canned coconut milk"]),
     "kakang gata": ("kakang gata (coconut cream)", D, ["coconut cream", "coconut cream kakang gata", "thick coconut milk"]),
-    "sampalok": ("sampalok (tamarind)", D, ["tamarind", "sampaloc", "tamarind mix", "sampalok mix", "young tamarind", "sinigang mix", "sinigang sa sampaloc mix", "tamarind soup base", "maggi magic sinigang original sampalok mix", "maggi magic sinigang", "tamarind paste"]),
+    "sampalok": ("sampalok (tamarind)", D, ["tamarind", "sampaloc", "tamarind mix", "sampalok mix", "young tamarind", "sinigang mix", "sinigang powder", "sinigang sa sampaloc mix", "tamarind soup base", "maggi magic sinigang original sampalok mix", "maggi magic sinigang", "tamarind paste"]),
     "laurel": ("laurel (bay leaf)", D, ["bay leaf", "bay leaves", "dried bay leaves", "laurel leaves"]),
     "atsuete": ("atsuete (annatto)", D, ["annatto powder", "annatto seeds", "atsuete powder", "atsuete seeds", "achuete", "annatto oil"]),
     "sarsa ng kamatis": ("sarsa ng kamatis (tomato sauce)", D, ["tomato sauce"]),
@@ -165,13 +183,13 @@ VOCAB = {
     "ketsup": ("ketsup (banana ketchup)", D, ["banana ketchup", "ketchup", "tomato ketchup"]),
     "oyster sauce": ("oyster sauce", D, ["oyster sauce", "maggi oyster sauce"]),
     "mantikilya ng mani": ("mantikilya ng mani (peanut butter)", D, ["peanut butter"]),
-    "mani": ("mani (peanuts)", D, ["peanuts", "roasted peanuts", "ground peanuts"]),
+    "mani": ("mani (peanuts)", D, ["peanuts", "roasted peanuts", "ground peanuts", "peanut"]),
     "kasoy": ("kasoy (cashew)", D, ["cashews", "unsalted cashews", "cashew nuts"]),
     "gatas": ("gatas (milk)", D, ["milk", "fresh milk", "whole milk", "lukewarm milk", "cow's milk"]),
     "gatas na evaporada": ("gatas na evaporada (evaporated milk)", D, ["evaporated milk"]),
-    "gatas na kondensada": ("gatas na kondensada (condensed milk)", D, ["condensed milk", "sweetened condensed milk", "nestlé carnation condensada", "carnation condensada"]),
-    "all purpose cream": ("all purpose cream", D, ["all purpose cream", "all-purpose cream", "table cream", "nestlé all purpose cream", "heavy cream", "whipping cream"]),
-    "keso": ("keso (cheese)", D, ["cheese", "cheddar cheese", "processed cheese", "american processed cheese", "processed cheese eden brand", "quickmelt cheese"]),
+    "gatas na kondensada": ("gatas na kondensada (condensed milk)", D, ["condensed milk", "sweetened condensed milk", "nestlé carnation condensada", "carnation condensada", "carnation condesada"]),
+    "all purpose cream": ("all purpose cream", D, ["all purpose cream", "all-purpose cream", "table cream", "nestlé all purpose cream", "all purpose creamer", "heavy cream", "whipping cream"]),
+    "keso": ("keso (cheese)", D, ["cheese", "cheddar cheese", "processed cheese", "american processed cheese", "processed cheese eden brand", "quickmelt cheese", "sharp cheddar"]),
     "keso de bola": ("keso de bola (edam cheese)", D, ["keso de bola", "edam cheese"]),
     "itlog": ("itlog (egg)", D, ["egg", "eggs", "raw eggs", "whole eggs"]),
     "itlog na pula": ("itlog na pula (egg yolk)", D, ["egg yolk", "egg yolks"]),
@@ -184,11 +202,11 @@ VOCAB = {
     "bihon": ("bihon (rice noodles)", D, ["rice noodles", "rice sticks", "rice vermicelli"]),
     "pancit canton": ("pancit canton (egg noodles)", D, ["egg noodles", "flour sticks", "canton noodles"]),
     "miki": ("miki (fresh egg noodles)", D, ["fresh egg noodles", "miki noodles"]),
-    "misua": ("misua (wheat vermicelli)", D, ["wheat vermicelli", "misua noodles"]),
+    "misua": ("misua (wheat vermicelli)", D, ["wheat vermicelli", "misua noodles", "miswa"]),
     "spaghetti": ("spaghetti", D, ["spaghetti", "spaghetti noodles", "spaghetti pasta"]),
     "macaroni": ("macaroni", D, ["macaroni", "elbow macaroni", "salad macaroni"]),
     "balat ng lumpia": ("balat ng lumpia (lumpia wrapper)", D, ["lumpia wrapper", "lumpia wrappers", "spring roll wrappers", "spring roll wrapper"]),
-    "balat ng siomai": ("balat ng siomai (wonton wrapper)", D, ["wonton wrapper", "wonton wrappers", "molo wrapper", "molo wrappers"]),
+    "balat ng siomai": ("balat ng siomai (wonton wrapper)", D, ["wonton wrapper", "wonton wrappers", "molo wrapper", "molo wrappers", "shumai wrappers", "siomai wrappers"]),
     "monggo": ("monggo (mung beans)", D, ["mung beans", "monggo beans", "green mung beans"]),
     "garbanzos": ("garbanzos (chickpeas)", D, ["garbanzo beans", "chickpeas", "garbanzos"]),
     "pinya sa lata": ("pinya sa lata (canned pineapple)", D, ["pineapple chunks", "pineapple tidbits", "crushed pineapple", "canned pineapple"]),
@@ -236,7 +254,38 @@ VOCAB = {
     "tsokolate": ("tsokolate (cocoa)", D, ["cocoa powder", "unsweetened cocoa", "tablea", "chocolate"]),
     "ube extract": ("ube extract", D, ["ube extract", "ube flavoring"]),
     "pinipig": ("pinipig (pounded young rice)", D, ["pinipig", "pounded young rice"]),
+    "mayonesa": ("mayonesa (mayonnaise)", D, ["mayonnaise"]),
+    "tausi": ("tausi (salted black beans)", D, ["salted black beans", "fermented black beans", "tausi"]),
+    "food coloring": ("food coloring", D, ["food coloring", "red food coloring"]),
+    "anisado": ("anisado (anise wine)", D, ["anisado wine", "anisado"]),
+    "white wine": ("white wine", D, ["white wine", "dry white wine"]),
+    "ginataang gulay mix": ("ginataang gulay mix", D, ["ginataang gulay mix", "ginataang gulay recipe mix"]),
+    "luncheon meat": ("luncheon meat", D, ["luncheon meat", "spam"]),
+    "vienna sausage": ("vienna sausage", D, ["vienna sausages", "vienna sausage"]),
+    "miso": ("miso", D, ["miso paste", "miso"]),
+    "kasubha": ("kasubha (safflower)", D, ["kasubha", "safflower"]),
+    "saffron": ("saffron", D, ["saffron threads", "saffron", "spanish saffron"]),
+    "tengang daga": ("tengang daga (wood ear mushroom)", D, ["dried wood ear", "wood ear", "wood ear mushrooms", "tenga ng daga"]),
+    "italian seasoning": ("italian seasoning", D, ["italian seasoning"]),
+    "nutmeg": ("nutmeg", D, ["nutmeg", "ground nutmeg"]),
+    "kecap manis": ("kecap manis (sweet soy sauce)", D, ["kecap manis", "sweet soy sauce"]),
+    "tapioca starch": ("tapioca starch", D, ["tapioca starch", "tapioca flour"]),
+    "honey": ("honey (pulot-pukyutan)", D, ["honey"]),
+    "linga": ("linga (sesame seeds)", D, ["sesame seeds", "toasted sesame seeds"]),
+    "sweetened beans": ("sweetened beans (minatamis na beans)", D, ["sweetened beans", "sweetened garbanzo", "sweetened garbanzos"]),
+    "chili paste": ("chili paste", D, ["chili paste", "chili garlic paste"]),
+    "bouillon cube": ("bouillon cube", D, ["bouillon cubes", "bouillon cube"]),
+    "sarsa ng lechon": ("sarsa ng lechon (lechon sauce)", D, ["lechon sarsa", "lechon sauce", "mang tomas"]),
+    "macapuno": ("macapuno", D, ["macapuno", "macapuno strings", "sweetened macapuno"]),
+    "oreo cookies": ("oreo cookies", D, ["oreo cookies", "oreo"]),
+    "vegetable broth": ("vegetable broth", D, ["vegetable broth", "vegetable stock"]),
     "leeks": ("leeks", G, ["leeks", "leek"]),
+
+    # ---- merged, but no confident aisle: fresh yet not produce, or sold both
+    # fresh and canned. The merge key still holds; aisle stays null for review.
+    "tokwa": ("tokwa (firm tofu)", None, ["firm tofu", "tokwa", "fried tofu"]),
+    "silken tofu": ("silken tofu", None, ["silken tofu", "soft tofu"]),
+    "apulid": ("apulid (water chestnut)", None, ["water chestnut", "water chestnuts"]),
 }
 
 # English display label per canonical: the English gloss from the display name
@@ -249,6 +298,8 @@ EN_OVERRIDE = {
     "ham": "ham",
     "breadcrumbs": "breadcrumbs",
     "yeast": "yeast",
+    "honey": "honey",
+    "sweetened beans": "sweetened beans",
 }
 
 

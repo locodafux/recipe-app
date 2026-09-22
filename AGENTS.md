@@ -37,7 +37,8 @@ To change the catalogue, edit the curated inputs and re-run — never patch the 
   hard-block automated access. Working sources are panlasangpinoy.com,
   kawalingpinoy.com and nestlegoodnes.com/ph.
 - **`aisle: null` means "the map could not place this"**, not "no aisle". It is the
-  worklist for the M4 human tagging pass. Never fill it with a guess.
+  worklist for the M4 human tagging pass. Never fill it with a guess. A `VOCAB`
+  entry may be deliberately aisle-less (tofu, water chestnut): it still merges.
 - **`data/synonyms.json` is the merge key, not display text.** The UI is English:
   show `label` (per line) or `labels.json` (by canonical, aisle, category key), never
   the Filipino keys. Resolve an ingredient to its canonical name *before* comparing

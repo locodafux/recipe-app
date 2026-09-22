@@ -21,6 +21,12 @@ CASES = [
     ("1 thumb-size ginger",                             1.0,   "thumb", "ginger"),
     ("salt and freshly ground black pepper",            None,  None,    "salt"),
     ("water",                                           None,  None,    "water"),
+    ("water for boiling",                               None,  None,    "water"),
+    ("2 tablespoons sukang iloko (see note 1)",         2.0,   "tbsp",  "sukang iloko"),
+    ("1 package (16 ounces) frozen grated ube, thawed", 1.0,   "pack",  "ube"),
+    ("2 packages (16 ounces each) frozen grated cassava, thawed", 2.0, "pack", "cassava"),
+    ("1 package (16 ounces or two cups) frozen grated cassava", 1.0, "pack", "cassava"),
+    ("1/4 pound (about 1 cup) boneless, skinless chicken breast", 0.25, "lb", "skinless chicken breast"),
 ]
 
 
