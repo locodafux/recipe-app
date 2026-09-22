@@ -21,3 +21,6 @@ export const CATEGORIES: { key: string; label: string; icon: string }[] = [
 const CAT = new Map(CATEGORIES.map((c) => [c.key, c]));
 export const categoryLabel = (key: string) => CAT.get(key)?.label ?? key;
 export const categoryIcon = (key: string) => CAT.get(key)?.icon ?? '🍽️';
+
+/** Repeat (6B) finds a past trip's dishes by name: list rows keep names, not ids. */
+export const ID_BY_NAME = new Map(RECIPES.map((r) => [r.name, r.id]));

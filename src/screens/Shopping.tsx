@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
 import { Alert, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { byAisle, type Line } from '../merge.ts';
-import { useOnline, useSession } from '../remote.ts';
+import { flushArchives, useOnline, useSession } from '../remote.ts';
 import { canUndo, finishShopping, tick, undo, useStore } from '../store.ts';
 import { firstName } from '../sync.ts';
 import { Button, C, Cta, Header, Section, s } from '../ui.tsx';
@@ -49,8 +49,8 @@ export function Shopping({ lines, onClose, onInvite }: { lines: Line[]; onClose:
   const below = unseen.filter((k) => (ys.current.get(k) ?? 0) > view.current.y).length;
 
   const finish = () => {
-    const done = () => { finishShopping(); onClose(); };
-    const msg = `${bought} of ${lines.length} bought. This clears the ticks.`;
+    const done = () => { finishShopping(lines); flushArchives(); onClose(); };
+    const msg = `${bought} of ${lines.length} bought. The trip moves to History${shared?.partner ? ' for both of you' : ''} and this list can no longer change.`;
     if (Platform.OS === 'web') { if (window.confirm(`Finish shopping?\n${msg}`)) done(); return; }
     Alert.alert('Finish shopping?', msg, [{ text: 'Keep shopping', style: 'cancel' }, { text: 'Finish', onPress: done }]);
   };
