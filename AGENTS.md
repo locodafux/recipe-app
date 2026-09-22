@@ -68,6 +68,17 @@ npx expo start      # add --web to check screens in a browser
   via `pendingTicks()` / `markSynced()`; D5 undo is allowed only while a tick is unsynced.
 - `CI=1 expo start` turns off Metro's file watcher: edits will not reach the bundle.
 
+## What's new (before every APK build)
+
+After an update the app shows, once, the changelog entries the phone has not seen; a fresh install shows none.
+Releases reuse one rolling `latest` GitHub Release tag, so "new build" is decided by the newest entry `id` in
+`src/changelog.ts`, not by a tag or a network call. Before each APK build:
+
+1. Add an entry at the **top** of `CHANGELOG` in `src/changelog.ts` with a new unique `id` (the build date,
+   e.g. `2026-10-05`; add `-2` for a second build that day) and plain-English items for users. No new entry = no sheet.
+2. Bump `expo.version` in `app.json` so the installed version reads differently (optional for the sheet itself).
+3. `npm test` (`src/whatsnew.test.ts` checks the show-once rules and that ids are unique).
+
 ## Shared list sync (M3)
 
 The app talks to the hosted project whose public URL and publishable key are defaults in `src/remote.ts`

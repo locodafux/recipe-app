@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useMemo, useState } from 'react';
 import { Alert, BackHandler, Platform, Pressable, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { CHANGELOG } from './src/changelog.ts';
 import { BY_ID, INDEX } from './src/data.ts';
 import { merge } from './src/merge.ts';
 import { ensureList, openLink, useSync, type InvitePreview } from './src/remote.ts';
@@ -16,8 +17,10 @@ import { Join } from './src/screens/Join.tsx';
 import { ListTab, type Segment } from './src/screens/ListTab.tsx';
 import { RecipeDetail } from './src/screens/RecipeDetail.tsx';
 import { Shopping } from './src/screens/Shopping.tsx';
-import { hydrate, useStore } from './src/store.ts';
+import { WhatsNew } from './src/screens/WhatsNew.tsx';
+import { hydrate, markSeen, useStore } from './src/store.ts';
 import { rowsToLines } from './src/sync.ts';
+import { unseen } from './src/whatsnew.ts';
 import { C, Header, s } from './src/ui.tsx';
 
 type Tab = 'dishes' | 'list' | 'history';
@@ -30,6 +33,7 @@ export default function App() {
       <StatusBar style="dark" />
       <SafeAreaView style={{ flex: 1, backgroundColor: C.paper }} edges={['top', 'left', 'right']}>
         {ready && <Main />}
+        {ready && <News />}
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -99,6 +103,13 @@ function Main() {
       </SafeAreaView>
     </View>
   );
+}
+
+/** What's new, once per build: dismissing records the newest entry as seen. */
+function News() {
+  const { seen } = useStore();
+  const entries = unseen(CHANGELOG, seen);
+  return entries.length > 0 && <WhatsNew entries={entries} onClose={() => markSeen(CHANGELOG[0].id)} />;
 }
 
 function SafeBottom({ children }: { children: React.ReactNode }) {

@@ -2,6 +2,7 @@
 // No network code: src/remote.ts flushes ticks via pendingTicks()/markSynced() and feeds in applyRows().
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSyncExternalStore } from 'react';
+import { CHANGELOG } from './changelog.ts';
 import { applyRemote, type Row, type Tick } from './sync.ts';
 
 export type { Tick };
@@ -20,6 +21,7 @@ type State = {
   week: string[]; // recipe ids, in the order they were added
   ticks: Record<string, Tick>; // keyed by merge key (Line.key)
   shared: Shared | null;
+  seen?: string; // newest What's new entry shown (src/whatsnew.ts)
 };
 
 const KEY = 'recipe-app/state/v1';
@@ -35,7 +37,8 @@ function set(next: State) {
 export async function hydrate() {
   try {
     const saved = await AsyncStorage.getItem(KEY);
-    if (saved) set({ ...state, ...JSON.parse(saved) });
+    // A fresh install has nothing saved: mark the current notes seen so a new user gets no changelog.
+    set(saved ? { ...state, ...JSON.parse(saved) } : { ...state, seen: CHANGELOG[0]?.id });
   } catch (e) {
     console.warn('load failed', e);
   }
@@ -48,6 +51,10 @@ export function useStore(): State {
     (l) => (listeners.add(l), () => listeners.delete(l)),
     () => state,
   );
+}
+
+export function markSeen(id: string) {
+  set({ ...state, seen: id });
 }
 
 export function toggleDish(id: string) {
