@@ -44,6 +44,39 @@ To change the catalogue, edit the curated inputs and re-run — never patch the 
   arrives it must re-implement `resolve()` against the same `data/synonyms.json`
   rather than forking the map.
 
+## Shared-list backend (Supabase)
+
+`supabase/` is a Supabase CLI project. The schema is one migration in `supabase/migrations/`;
+change it by adding a new migration, never by editing an applied one.
+
+```
+supabase/check/check.sh                 # no Docker: throwaway local Postgres + auth stub
+supabase start && supabase db reset     # full local stack (needs Docker)
+DB_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres supabase/check/check.sh
+```
+
+`check.sh` proves RLS isolation, the false→true tick rule, the invite flow and archiving. It is a
+plain psql script, not pgTAP, so it lives outside `supabase/tests/` (where `supabase test db` looks).
+No hosted Supabase project exists yet. Magic-link emails from the local stack show up in Mailpit
+at http://127.0.0.1:54324.
+
+### Sharp edges
+
+- **The database enforces README section 4's OR rule**, in the `guard_list_item` trigger. An update
+  that sets `checked = false` on a ticked item is silently kept at true, not rejected, so a slower
+  phone's queue still flushes. The server sets `checked_by`/`checked_at` and keeps whoever reached
+  it first. Undo (design call D5) is therefore client-only: drop the tick from the local queue
+  before it flushes.
+- **Archived lists are frozen**: no edits to the list, its items or its invites, and no un-archiving.
+  To re-run a trip, copy its items into a new list.
+- **Invites**: a member inserts `invites(list_id, email)`. The app then calls
+  `supabase.auth.signInWithOtp({ email, options: { emailRedirectTo } })` with the returned `token`
+  in the redirect URL, and after sign-in the invitee's app calls `rpc('accept_invite', { p_token })`.
+  The token is single-use and only works for the invited email. Redirect URLs must be allowed in
+  `supabase/config.toml` (`additional_redirect_urls`; add the app's own scheme once it has one).
+- Membership rows are written only by the `add_list_owner` trigger and `accept_invite`. Clients have
+  no insert policy on `list_members`.
+
 ## Maintaining this file
 
 Keep this file for knowledge useful to almost every future agent session in this project.
