@@ -2,6 +2,7 @@
   "expo": {
     "name": "Palengke List",
     "slug": "recipe-app",
+    "scheme": "recipe-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

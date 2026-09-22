@@ -160,8 +160,9 @@ site_url = "http://127.0.0.1:3000"
 # The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
 # external_url = ""
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-# exp://** lets magic links open the Expo dev client; add the app scheme once it exists.
-additional_redirect_urls = ["https://127.0.0.1:3000", "exp://**"]
+# Magic links open the app at <scheme>/join: exp://** for Expo Go, recipe-app://** for builds (app.json
+# "scheme"), localhost:8081 for `expo start --web`. Globs, because the invite token rides in the query.
+additional_redirect_urls = ["https://127.0.0.1:3000", "exp://**", "recipe-app://**", "http://localhost:8081/**"]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # JWT issuer URL. If not set, defaults to auth.external_url.

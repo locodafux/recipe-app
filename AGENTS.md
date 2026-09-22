@@ -63,13 +63,29 @@ npx expo start      # add --web to check screens in a browser
   imports out of them.
 - The UI is English. Show `displayName()` (English label, else `item`), never the
   canonical merge key.
-- All tick state goes through `src/store.ts` (local only, AsyncStorage). Sync plugs in
+- All tick state goes through `src/store.ts` (AsyncStorage). `src/remote.ts` flushes it
   via `pendingTicks()` / `markSynced()`; D5 undo is allowed only while a tick is unsynced.
 - `CI=1 expo start` turns off Metro's file watcher: edits will not reach the bundle.
 
+## Shared list sync (M3)
+
+The app talks to the hosted project whose public URL and publishable key are defaults in `src/remote.ts`
+(safe to commit; never a secret/service key). `EXPO_PUBLIC_SUPABASE_URL`/`_ANON_KEY` in `.env.local`
+override them, e.g. for the local stack (see `.env.example`). Rules are pure in `src/sync.ts` (tested by `src/sync.test.ts`); `src/remote.ts`
+only moves data.
+
+- A list item is one row per unit of a market-list line: `item` is the line's merge key, so a tick
+  updates every row with that `item`. `label`/`dishes`/`position` exist so the invitee's phone, which never
+  merged the dishes, shows the same English list. While a list is shared both phones render its rows.
+- Auth uses the **implicit** flow, not PKCE: the inviter's phone requests the invitee's magic link, so
+  the invitee holds no code verifier. Tokens arrive in the redirect's `#fragment`; `openLink()` reads them.
+- Magic links redirect to `Linking.createURL('join')` (`recipe-app://join` in builds); every form of it
+  must be an allowed redirect: `additional_redirect_urls` in `supabase/config.toml` locally, the
+  dashboard's URL configuration on the hosted project (`recipe-app://**`).
+
 ## Shared-list backend (Supabase)
 
-`supabase/` is a Supabase CLI project. The schema is one migration in `supabase/migrations/`;
+`supabase/` is a Supabase CLI project. The schema is the migrations in `supabase/migrations/`;
 change it by adding a new migration, never by editing an applied one.
 
 ```
