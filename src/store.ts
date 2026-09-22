@@ -3,6 +3,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSyncExternalStore } from 'react';
 import { CHANGELOG } from './changelog.ts';
+import { mergeHistory, repeatIds, tripFromLines, tripFromRows, type Trip } from './history.ts';
+import type { Line } from './merge.ts';
 import { applyRemote, type Row, type Tick } from './sync.ts';
 
 export type { Tick };
@@ -22,10 +24,12 @@ type State = {
   ticks: Record<string, Tick>; // keyed by merge key (Line.key)
   shared: Shared | null;
   seen?: string; // newest What's new entry shown (src/whatsnew.ts)
+  history: Trip[]; // finished trips, newest first
+  archiving: { id: string; ticks: string[] }[]; // shared lists finished offline: archive them, and these ticks, on reconnect
 };
 
 const KEY = 'recipe-app/state/v1';
-let state: State = { week: [], ticks: {}, shared: null };
+let state: State = { week: [], ticks: {}, shared: null, history: [], archiving: [] };
 const listeners = new Set<() => void>();
 
 function set(next: State) {
@@ -111,7 +115,41 @@ export function applyRows(listId: string, rows: Row[]) {
   set({ ...state, shared: { ...shared, rows: [...byId.values()] }, ticks: applyRemote(state.ticks, rows, shared.me) });
 }
 
-/** Ends the trip and stops sharing its list. Archiving to History (M5) hooks in here. */
-export function finishShopping() {
-  set({ ...state, ticks: {}, shared: null });
+/**
+ * Finish shopping: the trip goes to History and sharing stops. The week that made the list starts empty
+ * (an invitee's own week was never on it). A shared list joins the archive queue with the ticks that
+ * never reached the server, so remote.ts can archive it at once or on reconnect.
+ */
+export function finishShopping(lines: Line[], now = new Date()) {
+  const { shared, ticks } = state;
+  const trip = tripFromLines(shared?.id ?? `local-${now.getTime()}`, now, lines, Object.keys(ticks));
+  const archiving = shared ? [...state.archiving, { id: shared.id, ticks: pendingTicks().map((t) => t.key) }] : state.archiving;
+  set({ ...state, week: !shared || shared.owner ? [] : state.week, ticks: {}, shared: null, archiving, history: mergeHistory(state.history, [trip]) });
+}
+
+/**
+ * The partner finished the shared list on their phone: keep it as the server has it and stop sharing.
+ * The owner's week was that list, so it ends too; an invitee's own week was never on it.
+ */
+export function closeArchived(listId: string, archivedAt: string, rows: Row[]) {
+  const { shared } = state;
+  if (shared?.id !== listId) return;
+  set({ ...state, week: shared.owner ? [] : state.week, ticks: {}, shared: null, history: mergeHistory(state.history, [tripFromRows(listId, archivedAt, rows)]) });
+}
+
+export function archived(listId: string) {
+  set({ ...state, archiving: state.archiving.filter((a) => a.id !== listId) });
+}
+
+/** Archived lists from the server (both members' trips) join this phone's history. */
+export function setRemoteHistory(trips: Trip[]) {
+  set({ ...state, history: mergeHistory(state.history, trips) });
+}
+
+/**
+ * 6B "Make it a new list": this week becomes the trip's dishes, nothing ticked. The old trip is untouched.
+ * A shared list still in progress keeps its ticks; it takes the new dishes like any other edit.
+ */
+export function repeatTrip(trip: Trip, idByName: Map<string, string>) {
+  set({ ...state, week: repeatIds(trip, idByName), ticks: state.shared ? state.ticks : {} });
 }

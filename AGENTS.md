@@ -95,6 +95,15 @@ only moves data.
   must be an allowed redirect: `additional_redirect_urls` in `supabase/config.toml` locally, the
   dashboard's URL configuration on the hosted project (`recipe-app://**`).
 
+## History (M5)
+
+Rules are pure in `src/history.ts` (tested by `src/history.test.ts`). `finishShopping(lines)` in
+`src/store.ts` snapshots the trip into local `history` and, for a shared list, queues it in `archiving`
+with its unsent ticks; `flushArchives()` in `src/remote.ts` sends those ticks, then sets `archived_at`.
+`refreshHistory()` merges every archived list the user belongs to (server copy wins by list id).
+`syncNow()` notices when the partner archived the list and closes it on this phone. Rows keep dish
+names, not recipe ids, so Repeat looks dishes up by name (`ID_BY_NAME`).
+
 ## Shared-list backend (Supabase)
 
 `supabase/` is a Supabase CLI project. The schema is the migrations in `supabase/migrations/`;

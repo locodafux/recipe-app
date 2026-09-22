@@ -6,8 +6,9 @@ import { createClient, type Session } from '@supabase/supabase-js';
 import * as Linking from 'expo-linking';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { AppState } from 'react-native';
+import { dishSummary, tripFromRows } from './history.ts';
 import type { Line } from './merge.ts';
-import { applyRows, getState, markSynced, pendingTicks, setPartner, setShared } from './store.ts';
+import { applyRows, archived, closeArchived, getState, markSynced, pendingTicks, setPartner, setRemoteHistory, setShared } from './store.ts';
 import { firstName, flush, linesToRows, type Row } from './sync.ts';
 
 // The hosted project's public config. The publishable key is public by design (RLS guards the data);
@@ -122,9 +123,14 @@ export async function syncNow() {
   if (!supabase || !shared || flushing) return;
   flushing = true;
   try {
-    const { data, error } = await supabase.from('list_items').select().eq('list_id', shared.id);
-    if (error) throw error;
-    applyRows(shared.id, data as Row[]);
+    const [list, items] = await Promise.all([
+      supabase.from('lists').select('archived_at').eq('id', shared.id).single(),
+      supabase.from('list_items').select().eq('list_id', shared.id),
+    ]);
+    if (list.error) throw list.error;
+    if (items.error) throw items.error;
+    if (list.data.archived_at) return closeArchived(shared.id, list.data.archived_at, items.data as Row[]);
+    applyRows(shared.id, items.data as Row[]);
     const sent = await flush(pendingTicks(), async (key) => {
       const { error } = await supabase.from('list_items').update({ checked: true }).eq('list_id', shared.id).eq('item', key);
       if (error) throw error;
@@ -164,6 +170,38 @@ export function useSync(listId: string | undefined) {
   }, [listId]);
 }
 
+// --- history (M5) ---
+
+/**
+ * Archives lists finished on this phone: first the ticks that never reached the server, then `archived_at`
+ * (one-way; the database freezes the list after it). Offline, the queue waits for the next call.
+ */
+export async function flushArchives() {
+  if (!supabase) return;
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return; // signed out, RLS would match no rows and look like success
+  for (const a of getState().archiving) {
+    if (a.ticks.length) {
+      const { error } = await supabase.from('list_items').update({ checked: true }).eq('list_id', a.id).in('item', a.ticks);
+      if (error && !/archived/.test(error.message)) return; // offline: try again later
+    }
+    const { error } = await supabase.from('lists').update({ archived_at: new Date().toISOString() }).eq('id', a.id);
+    if (error && !/archived/.test(error.message)) return; // already archived by the partner counts as done
+    archived(a.id);
+  }
+}
+
+/** Every archived list this user is a member of, with its rows, into History. */
+export async function refreshHistory() {
+  if (!supabase) return;
+  await flushArchives();
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return;
+  const { data, error } = await supabase.from('lists').select('id, archived_at, list_items(*)').not('archived_at', 'is', null);
+  if (error) return console.warn('history failed', error.message);
+  setRemoteHistory(data.map((l) => tripFromRows(l.id, l.archived_at!, l.list_items as Row[])));
+}
+
 // --- invites (7A/7B/7C) ---
 
 /** Error text for the invite screens; a dropped connection reads as the offline state it is, not a crash. */
@@ -187,7 +225,7 @@ export async function sendInviteLink(invite: Pick<Invite, 'email' | 'token'>, li
   const shared = getState().shared!;
   const dishes = [...new Set(lines.flatMap((l) => l.from.map((f) => f.dish)))];
   const preview = { invite: invite.token, from: session?.user.email ?? '', list: shared.name, n: String(lines.length),
-    dishes: dishes.length > 2 ? `${dishes.slice(0, 2).join(', ')}, +${dishes.length - 2}` : dishes.join(', ') };
+    dishes: dishSummary(dishes) };
   const { error } = await supabase!.auth.signInWithOtp({ email: invite.email, options: { emailRedirectTo: redirect(preview) } });
   if (error) throw error;
 }

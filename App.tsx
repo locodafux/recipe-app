@@ -1,4 +1,4 @@
-// Three tabs (Dishes · List · History); Recipe detail and Shopping open over them, Shopping with no tab bar.
+// Three tabs (Dishes · List · History); Recipe detail, a past trip and Shopping open over them, Shopping with no tab bar.
 // ponytail: state-based navigation, no router. The one deep link (a magic link, maybe carrying an invite)
 // is read with expo-linking; move to expo-router if the app grows real routes.
 import { Ionicons } from '@expo/vector-icons';
@@ -10,8 +10,9 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { CHANGELOG } from './src/changelog.ts';
 import { BY_ID, INDEX } from './src/data.ts';
 import { merge } from './src/merge.ts';
-import { ensureList, openLink, useSync, type InvitePreview } from './src/remote.ts';
+import { ensureList, flushArchives, openLink, useSync, type InvitePreview } from './src/remote.ts';
 import { Browse } from './src/screens/Browse.tsx';
+import { History, TripDetail } from './src/screens/History.tsx';
 import { Invite } from './src/screens/Invite.tsx';
 import { Join } from './src/screens/Join.tsx';
 import { ListTab, type Segment } from './src/screens/ListTab.tsx';
@@ -21,7 +22,7 @@ import { WhatsNew } from './src/screens/WhatsNew.tsx';
 import { hydrate, markSeen, useStore } from './src/store.ts';
 import { rowsToLines } from './src/sync.ts';
 import { unseen } from './src/whatsnew.ts';
-import { C, Header, s } from './src/ui.tsx';
+import { C } from './src/ui.tsx';
 
 type Tab = 'dishes' | 'list' | 'history';
 
@@ -47,11 +48,13 @@ function Main() {
   const [shopping, setShopping] = useState(false);
   const [inviting, setInviting] = useState(false);
   const [join, setJoin] = useState<InvitePreview | null>(null);
+  const [trip, setTrip] = useState<string | null>(null);
 
   const lines = useMemo(() => merge(week.map((id) => BY_ID.get(id)).filter((r) => r !== undefined), INDEX), [week]);
   // While a list is shared, both phones shop from its rows, so they see the same items.
   const shopLines = useMemo(() => (shared?.rows.length ? rowsToLines(shared.rows) : lines), [shared?.rows, lines]);
   useSync(shared?.id);
+  useEffect(() => { flushArchives(); }, []); // a trip finished offline last time
 
   const url = Linking.useURL();
   useEffect(() => {
@@ -69,15 +72,18 @@ function Main() {
       if (inviting) return setInviting(false), true;
       if (shopping) return setShopping(false), true;
       if (detail) return setDetail(null), true;
+      if (trip) return setTrip(null), true;
       return false;
     });
     return () => sub.remove();
-  }, [shopping, detail, inviting, join]);
+  }, [shopping, detail, inviting, join, trip]);
+  const repeated = () => { setTrip(null); setSegment('dishes'); setTab('list'); };
 
   if (join) return <SafeBottom><Join invite={join} onBack={() => setJoin(null)} onJoined={() => { setJoin(null); setShopping(true); }} /></SafeBottom>;
   if (inviting) return <SafeBottom><Invite lines={shopLines} onBack={() => setInviting(false)} /></SafeBottom>;
   if (shopping) return <SafeBottom><Shopping lines={shopLines} onClose={() => setShopping(false)} onInvite={() => setInviting(true)} /></SafeBottom>;
   if (detail) return <SafeBottom><RecipeDetail id={detail} onBack={() => setDetail(null)} /></SafeBottom>;
+  if (trip) return <SafeBottom><TripDetail id={trip} onBack={() => setTrip(null)} onRepeated={repeated} /></SafeBottom>;
 
   return (
     <View style={{ flex: 1 }}>
@@ -89,12 +95,7 @@ function Main() {
           <ListTab lines={lines} segment={segment} setSegment={setSegment} onBrowse={() => setTab('dishes')}
             onOpen={setDetail} onShop={shop} onShared={() => setShopping(true)} />
         )}
-        {tab === 'history' && (
-          <View style={s.screen}>
-            <Header title="History" />
-            <View style={s.empty}><Text style={s.emptyText}>Finished trips will be kept here so you can repeat one.</Text></View>
-          </View>
-        )}
+        {tab === 'history' && <History onOpen={setTrip} onRepeated={repeated} />}
       </View>
       <SafeAreaView edges={['bottom']} style={{ flexDirection: 'row', borderTopWidth: 1, borderTopColor: C.line, backgroundColor: C.card, paddingTop: 7, paddingBottom: 9 }}>
         <TabButton icon="restaurant" label="Dishes" on={tab === 'dishes'} onPress={() => setTab('dishes')} />

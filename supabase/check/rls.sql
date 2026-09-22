@@ -117,6 +117,12 @@ select pg_temp.fails($$delete from list_items$$, 'archived');
 select pg_temp.fails($$insert into invites (list_id, email) values ('11111111-0000-0000-0000-000000000000', 'dan@example.com')$$, 'row-level security');
 select pg_temp.eq((select count(*) from list_items), 3::bigint, 'archived items kept');
 
+-- History (M5) is readable by both members: Bob sees the archived trip and what was ticked on it.
+select pg_temp.login('00000000-0000-0000-0000-00000000000b');
+select pg_temp.eq((select count(*) from lists where archived_at is not null), 1::bigint, 'member sees archived trip');
+select pg_temp.eq((select string_agg(item, ',' order by item) from list_items where checked), 'kangkong', 'member sees what was bought');
+select pg_temp.fails($$update lists set archived_at = now()$$, 'archived');
+
 -- An invite still pending when the list was archived no longer works.
 reset role;
 insert into auth.users (id, email) values ('00000000-0000-0000-0000-00000000000c', 'carol@example.com');
@@ -133,5 +139,5 @@ select pg_temp.eq((select count(*) from list_items), 0::bigint, 'owner deleted c
 -- Realtime broadcasts list_items.
 select pg_temp.eq((select count(*) from pg_publication_tables where pubname = 'supabase_realtime' and tablename = 'list_items'), 1::bigint, 'list_items in realtime');
 
-\echo 'ok: RLS isolation, false->true ticks, invites and archiving all hold'
+\echo 'ok: RLS isolation, false->true ticks, invites, archiving and history all hold'
 rollback;
