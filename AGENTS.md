@@ -43,9 +43,29 @@ To change the catalogue, edit the curated inputs and re-run — never patch the 
   the Filipino keys. Resolve an ingredient to its canonical name *before* comparing
   or adding quantities, via `tools/canonicalize.py`. `tools/test_canonicalize.py` guards the property that
   every variant of one ingredient collapses to exactly one canonical name.
-- The resolver lives in Python because M1 has no JS toolchain. When the Expo app
-  arrives it must re-implement `resolve()` against the same `data/synonyms.json`
-  rather than forking the map.
+- `resolve()` exists twice: `tools/canonicalize.py` (build time) and
+  `src/canonicalize.ts` (app). Both read the same `data/synonyms.json`; change one,
+  change both, and keep `src/canonicalize.test.ts` mirroring `tools/test_canonicalize.py`.
+
+## Expo app (M2)
+
+Expo + TypeScript at the repo root; screens in `src/screens/`, bundled data read by `src/data.ts`.
+
+```
+npm install
+npm test            # node:test on src/**/*.test.ts, no framework
+npx tsc --noEmit
+npx expo start      # add --web to check screens in a browser
+```
+
+- Pure-logic modules (`canonicalize.ts`, `merge.ts`) import each other with explicit
+  `.ts` extensions so Node can run the tests with no build step. Keep React Native
+  imports out of them.
+- The UI is English. Show `displayName()` (English label, else `item`), never the
+  canonical merge key.
+- All tick state goes through `src/store.ts` (local only, AsyncStorage). Sync plugs in
+  via `pendingTicks()` / `markSynced()`; D5 undo is allowed only while a tick is unsynced.
+- `CI=1 expo start` turns off Metro's file watcher: edits will not reach the bundle.
 
 ## Shared-list backend (Supabase)
 

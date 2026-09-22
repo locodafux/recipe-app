@@ -1,3 +1,16 @@
 # build-time page cache for tools/build-recipes.py -- re-fetchable, never committed
 .cache/
 __pycache__/
+
+# Expo app
+node_modules/
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+.kotlin/
+*.tsbuildinfo
+.DS_Store
+.env*.local
+/ios
+/android
