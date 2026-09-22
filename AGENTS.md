@@ -8,7 +8,7 @@ anything under `data/`.
 
 ## Recipe catalogue (M1)
 
-`data/recipes.json` and `data/synonyms.json` are **generated**, not hand-edited.
+`data/recipes.json`, `data/synonyms.json` and `data/labels.json` are **generated**, not hand-edited.
 Rebuild with:
 
 ```
@@ -24,6 +24,8 @@ To change the catalogue, edit the curated inputs and re-run — never patch the 
 
 - `tools/dishes.py` — which dishes are in the catalogue, and the slug terms that find them.
 - `tools/vocab.py` — canonical Filipino ingredient names, their variants and their aisle.
+- English UI text: ingredient labels and aisle names (display order) in `tools/vocab.py`,
+  category names (chip order) in `tools/dishes.py`.
 
 ### Sharp edges
 
@@ -36,9 +38,10 @@ To change the catalogue, edit the curated inputs and re-run — never patch the 
   kawalingpinoy.com and nestlegoodnes.com/ph.
 - **`aisle: null` means "the map could not place this"**, not "no aisle". It is the
   worklist for the M4 human tagging pass. Never fill it with a guess.
-- **`data/synonyms.json` is the merge key, not display text.** Resolve an ingredient
-  to its canonical name *before* comparing or adding quantities, via
-  `tools/canonicalize.py`. `tools/test_canonicalize.py` guards the property that
+- **`data/synonyms.json` is the merge key, not display text.** The UI is English:
+  show `label` (per line) or `labels.json` (by canonical, aisle, category key), never
+  the Filipino keys. Resolve an ingredient to its canonical name *before* comparing
+  or adding quantities, via `tools/canonicalize.py`. `tools/test_canonicalize.py` guards the property that
   every variant of one ingredient collapses to exactly one canonical name.
 - The resolver lives in Python because M1 has no JS toolchain. When the Expo app
   arrives it must re-implement `resolve()` against the same `data/synonyms.json`

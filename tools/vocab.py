@@ -8,6 +8,8 @@ English word exists (sampalok (tamarind), gabi (taro)), Filipino alone where it
 does not (kangkong, bagoong alamang). Where no Filipino word is in common use --
 bell pepper, oyster sauce -- the English stands alone rather than inventing one.
 
+The display name is the data's `item`; the app shows the English LABELS below.
+
 Variants are candidates only. data/synonyms.json ships just the ones some source
 actually wrote; see build_synonyms() in build-recipes.py.
 
@@ -16,7 +18,14 @@ dry goods. Anything this map cannot place gets aisle=null in the output so the
 M4 human pass can find it -- a wrong guess is worse than an honest blank.
 """
 
+import re
+
 G, K, I, D = "gulay", "karne", "isda", "dry goods"
+
+# English UI names. The Filipino keys stay the data values and the merge key; these
+# are display text only. Dict order is the walk order through the palengke (D2:
+# dry before wet), so the shopping list shows sections in this order.
+AISLES = {G: "Vegetables", D: "Dry goods", I: "Fish & seafood", K: "Meat"}
 
 VOCAB = {
     # ---- gulay: produce, fresh herbs, chillies ------------------------------
@@ -229,6 +238,28 @@ VOCAB = {
     "pinipig": ("pinipig (pounded young rice)", D, ["pinipig", "pounded young rice"]),
     "leeks": ("leeks", G, ["leeks", "leek"]),
 }
+
+# English display label per canonical: the English gloss from the display name
+# ("sampalok (tamarind)" -> tamarind), else the name itself. Names with no useful
+# English word stay as they are (kangkong, bagoong alamang, okra). EN_OVERRIDE
+# covers the display names whose bracket holds Filipino, not English.
+EN_OVERRIDE = {
+    "shallots": "shallots",
+    "tripe": "tripe",
+    "ham": "ham",
+    "breadcrumbs": "breadcrumbs",
+    "yeast": "yeast",
+}
+
+
+def _english(canonical, display):
+    if canonical in EN_OVERRIDE:
+        return EN_OVERRIDE[canonical]
+    m = re.search(r"\(([^)]+)\)", display)
+    return m.group(1).strip() if m else display
+
+
+LABELS = {c: _english(c, display) for c, (display, _a, _v) in VOCAB.items()}
 
 # Conservative fallback for items the vocabulary does not list. Only patterns that
 # cannot plausibly land in the wrong section -- everything else gets aisle=null.

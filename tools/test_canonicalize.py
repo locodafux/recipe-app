@@ -5,6 +5,7 @@ The property that matters: every way the sources spell one ingredient must
 collapse to exactly one canonical name. If that breaks, the grocery list shows
 sampalok on three separate lines and the whole point of the app is gone.
 """
+import json
 import pathlib
 import sys
 
@@ -13,6 +14,9 @@ from canonicalize import build_index, load, normalize, resolve  # noqa: E402
 
 SYNONYMS = load()
 INDEX = build_index(SYNONYMS)
+DATA = pathlib.Path(__file__).resolve().parent.parent / "data"
+LABELS = json.loads((DATA / "labels.json").read_text(encoding="utf-8"))
+RECIPES = json.loads((DATA / "recipes.json").read_text(encoding="utf-8"))
 
 
 def r(s):
@@ -86,6 +90,43 @@ def test_merging_two_recipes_gives_one_line():
         merged.setdefault(r(item), 0)
         merged[r(item)] += qty
     assert merged == {"sampalok": 2, "bawang": 8}, merged
+
+
+def test_every_canonical_has_an_english_label():
+    """The UI is English; the merge key stays Filipino. Labels are display only."""
+    labels = LABELS["ingredients"]
+    assert set(labels) == set(SYNONYMS), set(labels) ^ set(SYNONYMS)
+    assert labels["sampalok"] == "tamarind" and labels["bawang"] == "garlic"
+    # No useful English word: these keep their own name.
+    for keep in ("kangkong", "bagoong alamang", "okra"):
+        assert labels[keep] == keep
+    bad = [l for l in labels.values() if not l or "(" in l]
+    assert not bad, bad
+
+
+def test_english_label_resolves_back_to_its_canonical():
+    """An English label must never be a second merge key for another ingredient."""
+    bad = [(c, l, r(l)) for c, l in LABELS["ingredients"].items() if r(l) != c]
+    assert not bad, bad
+
+
+def test_aisles_walk_dry_before_wet():
+    """D2: the shopping list walks Vegetables, Dry goods, Fish & seafood, Meat."""
+    assert [(a["key"], a["label"]) for a in LABELS["aisles"]] == [
+        ("gulay", "Vegetables"), ("dry goods", "Dry goods"),
+        ("isda", "Fish & seafood"), ("karne", "Meat")]
+
+
+def test_recipes_carry_english_labels():
+    cats = {c["key"] for c in LABELS["categories"]}
+    assert [c["label"] for c in LABELS["categories"]] == [
+        "Meat", "Seafood", "Soups", "Vegetables", "Noodles & rice", "Snacks", "Desserts"]
+    aisles = {a["key"] for a in LABELS["aisles"]} | {None}
+    for rec in RECIPES:
+        assert rec["category"] in cats, rec["id"]
+        for ing in rec["ingredients"]:
+            assert ing["label"], (rec["id"], ing)
+            assert ing["aisle"] in aisles, (rec["id"], ing)
 
 
 if __name__ == "__main__":
