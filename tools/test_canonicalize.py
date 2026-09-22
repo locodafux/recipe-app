@@ -78,6 +78,38 @@ def test_normalize_is_case_and_punctuation_insensitive():
     assert r("Soy Sauce") == r("soy sauce") == "toyo"
 
 
+def test_m4_merges_collapse():
+    """The M4 aisle pass folded these spellings together; each group is one purchase."""
+    groups = {
+        "baka": ["chuck roast or top round", "top round or sirloin", "top sirloin", "ribeye steak"],
+        "siling haba": ["finger chilies", "long green peppers", "long green pepper"],
+        "tausi": ["tausi salted black beans", "salted black beans"],
+        "pata ng baka": ["cow trotters", "ox feet"],
+        "bituka": ["pig intestine boiled", "pig or cow s small intestine"],
+        "hilaw na papaya": ["unripe papaya wedged", "unripe green papaya", "grated green papaya"],
+        "ginataang gulay mix": ["knorr ginataang gulay mix", "knorr ginataang gulay recipe mix"],
+        "mayonesa": ["mayonnaise", "lady s choice mayonnaise"],
+        "dayap": ["lime", "limes"],
+        "saffron": ["saffron threads", "a pinch of spanish saffron"],
+        "macapuno": ["sweetened macapuno", "macapuno strings"],
+        "apulid": ["water chestnut", "water chestnuts"],
+        "sampalok": ["sinigang powder"],
+        "misua": ["miswa"],
+        "kalabasa": ["calabasa"],
+        "gatas na kondensada": ["nestlé carnation condesada"],
+    }
+    bad = {c: {s: r(s) for s in ss if r(s) != c} for c, ss in groups.items()}
+    bad = {c: v for c, v in bad.items() if v}
+    assert not bad, bad
+
+
+def test_longer_product_is_not_swallowed_by_its_base():
+    """Sweet soy sauce, peanut butter and lemon-lime soda are their own purchases."""
+    assert r("kecap manis") == r("sweet soy sauce") == "kecap manis"
+    assert r("peanut butter") == "mantikilya ng mani"
+    assert r("lemon lime soda") == "softdrinks"
+
+
 def test_merging_two_recipes_gives_one_line():
     """End to end: the reason the map exists.
 

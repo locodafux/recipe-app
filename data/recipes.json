@@ -689,11 +689,11 @@
     "source": "https://www.kawalingpinoy.com/beef-mechado/",
     "ingredients": [
       {
-        "item": "chuck roast or top round",
-        "label": "chuck roast or top round",
+        "item": "baka (beef)",
+        "label": "beef",
         "qty": 2.0,
         "unit": "lb",
-        "aisle": null
+        "aisle": "karne"
       },
       {
         "item": "taba ng baboy (pork fat)",
@@ -1150,11 +1150,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "plantains ripe",
-        "label": "plantains ripe",
+        "item": "saging (banana)",
+        "label": "banana",
         "qty": 1.0,
         "unit": null,
-        "aisle": null
+        "aisle": "gulay"
       },
       {
         "item": "patatas (potato)",
@@ -1218,11 +1218,11 @@
     "source": "https://www.kawalingpinoy.com/bistek/",
     "ingredients": [
       {
-        "item": "top round or sirloin",
-        "label": "top round or sirloin",
+        "item": "baka (beef)",
+        "label": "beef",
         "qty": 2.0,
         "unit": "lb",
-        "aisle": null
+        "aisle": "karne"
       },
       {
         "item": "lemon",
@@ -1382,18 +1382,18 @@
     "source": "https://panlasangpinoy.com/pork-sisig/",
     "ingredients": [
       {
-        "item": "pig ears",
+        "item": "tainga ng baboy (pig ears)",
         "label": "pig ears",
         "qty": 1.0,
         "unit": "lb",
-        "aisle": null
+        "aisle": "karne"
       },
       {
-        "item": "pig snout",
+        "item": "nguso ng baboy (pig snout)",
         "label": "pig snout",
         "qty": 1.0,
         "unit": "lb",
-        "aisle": null
+        "aisle": "karne"
       },
       {
         "item": "liempo (pork belly)",
@@ -1431,18 +1431,18 @@
         "aisle": "gulay"
       },
       {
-        "item": "lady s choice mayonnaise",
-        "label": "lady s choice mayonnaise",
+        "item": "mayonesa (mayonnaise)",
+        "label": "mayonnaise",
         "qty": 0.5,
         "unit": "cup",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
-        "item": "sukang iloko see note 1",
-        "label": "sukang iloko see note 1",
+        "item": "suka (vinegar)",
+        "label": "vinegar",
         "qty": 2.0,
         "unit": "tbsp",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "paminta (black pepper)",
@@ -1473,11 +1473,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "limes see note 3",
-        "label": "limes see note 3",
+        "item": "dayap (lime)",
+        "label": "lime",
         "qty": 2.0,
         "unit": null,
-        "aisle": null
+        "aisle": "gulay"
       },
       {
         "item": "liquid seasoning",
@@ -1724,11 +1724,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "tausi salted black beans",
-        "label": "tausi salted black beans",
+        "item": "tausi (salted black beans)",
+        "label": "salted black beans",
         "qty": 1.0,
         "unit": "can",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "pinya sa lata (canned pineapple)",
@@ -1741,7 +1741,7 @@
         "item": "puso ng saging (banana heart)",
         "label": "banana heart",
         "qty": 1.0,
-        "unit": null,
+        "unit": "pack",
         "aisle": "gulay"
       },
       {
@@ -1935,11 +1935,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "red food coloring",
-        "label": "red food coloring",
+        "item": "food coloring",
+        "label": "food coloring",
         "qty": 2.0,
         "unit": "drop",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "katas ng pinya (pineapple juice)",
@@ -1989,11 +1989,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "anisado wine",
-        "label": "anisado wine",
+        "item": "anisado (anise wine)",
+        "label": "anise wine",
         "qty": 2.0,
         "unit": "tbsp",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "suka (vinegar)",
@@ -2035,7 +2035,7 @@
         "label": "hog casings",
         "qty": null,
         "unit": null,
-        "aisle": null
+        "aisle": "karne"
       },
       {
         "item": "mantika (cooking oil)",
@@ -2057,11 +2057,11 @@
     "source": "https://panlasangpinoy.com/embutido/",
     "ingredients": [
       {
-        "item": "hotdog",
-        "label": "hotdog",
+        "item": "vienna sausage",
+        "label": "vienna sausage",
         "qty": 12.0,
         "unit": "piece",
-        "aisle": "karne"
+        "aisle": "dry goods"
       },
       {
         "item": "itlog na pinakuluan (hard-boiled egg)",
@@ -3072,11 +3072,11 @@
     "source": "https://www.kawalingpinoy.com/beef-salpicao/",
     "ingredients": [
       {
-        "item": "ribeye steak",
-        "label": "ribeye steak",
+        "item": "baka (beef)",
+        "label": "beef",
         "qty": 2.0,
         "unit": "lb",
-        "aisle": null
+        "aisle": "karne"
       },
       {
         "item": "asin at paminta (salt and pepper)",
@@ -3353,11 +3353,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "ox feet",
-        "label": "ox feet",
+        "item": "pata ng baka (cow trotters)",
+        "label": "cow trotters",
         "qty": 2.0,
         "unit": "lb",
-        "aisle": null
+        "aisle": "karne"
       },
       {
         "item": "sibuyas (onion)",
@@ -3690,11 +3690,11 @@
         "aisle": "karne"
       },
       {
-        "item": "knorr ginataang gulay mix",
-        "label": "knorr ginataang gulay mix",
+        "item": "ginataang gulay mix",
+        "label": "ginataang gulay mix",
         "qty": 2.0,
         "unit": "pack",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "gisantes (green peas)",
@@ -4138,7 +4138,7 @@
         "label": "white wine",
         "qty": 0.75,
         "unit": "cup",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "sibuyas (onion)",
@@ -4319,11 +4319,11 @@
         "aisle": "gulay"
       },
       {
-        "item": "vienna sausages",
-        "label": "vienna sausages",
+        "item": "vienna sausage",
+        "label": "vienna sausage",
         "qty": 1.0,
         "unit": "can",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "gatas na evaporada (evaporated milk)",
@@ -4727,11 +4727,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "mayonnaise",
+        "item": "mayonesa (mayonnaise)",
         "label": "mayonnaise",
         "qty": 0.25,
         "unit": "cup",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "mantikilya (butter)",
@@ -4776,11 +4776,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "sharp cheddar",
-        "label": "sharp cheddar",
+        "item": "keso (cheese)",
+        "label": "cheese",
         "qty": 1.0,
         "unit": "cup",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "pasas (raisins)",
@@ -4872,11 +4872,11 @@
         "aisle": "gulay"
       },
       {
-        "item": "finger chilies",
-        "label": "finger chilies",
+        "item": "siling haba (long green chili)",
+        "label": "long green chili",
         "qty": 4.0,
         "unit": "piece",
-        "aisle": null
+        "aisle": "gulay"
       },
       {
         "item": "lemon",
@@ -4968,11 +4968,11 @@
         "aisle": "gulay"
       },
       {
-        "item": "long green peppers",
-        "label": "long green peppers",
+        "item": "siling haba (long green chili)",
+        "label": "long green chili",
         "qty": 3.0,
         "unit": "piece",
-        "aisle": null
+        "aisle": "gulay"
       },
       {
         "item": "sibuyas (onion)",
@@ -6116,7 +6116,7 @@
         "item": "sampalok (tamarind)",
         "label": "tamarind",
         "qty": 1.0,
-        "unit": null,
+        "unit": "pack",
         "aisle": "dry goods"
       },
       {
@@ -6411,18 +6411,18 @@
         "aisle": "isda"
       },
       {
-        "item": "sinigang powder",
-        "label": "sinigang powder",
+        "item": "sampalok (tamarind)",
+        "label": "tamarind",
         "qty": 40.0,
         "unit": "g",
         "aisle": "dry goods"
       },
       {
-        "item": "miso paste",
-        "label": "miso paste",
+        "item": "miso",
+        "label": "miso",
         "qty": 6.0,
         "unit": "tbsp",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "kamatis (tomato)",
@@ -6460,11 +6460,11 @@
         "aisle": "gulay"
       },
       {
-        "item": "mustard greens",
+        "item": "mustasa (mustard greens)",
         "label": "mustard greens",
         "qty": 1.0,
         "unit": "bunch",
-        "aisle": null
+        "aisle": "gulay"
       },
       {
         "item": "patis (fish sauce)",
@@ -6725,7 +6725,7 @@
         "label": "chili paste",
         "qty": 2.0,
         "unit": "tbsp",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "kamatis (tomato)",
@@ -7163,7 +7163,7 @@
         "item": "sampalok (tamarind)",
         "label": "tamarind",
         "qty": 1.0,
-        "unit": null,
+        "unit": "pack",
         "aisle": "dry goods"
       },
       {
@@ -7453,11 +7453,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "unripe papaya wedged",
-        "label": "unripe papaya wedged",
+        "item": "hilaw na papaya (green papaya)",
+        "label": "green papaya",
         "qty": 1.0,
         "unit": "piece",
-        "aisle": null
+        "aisle": "gulay"
       },
       {
         "item": "chicken cube",
@@ -7603,11 +7603,11 @@
         "aisle": "karne"
       },
       {
-        "item": "pig intestine boiled",
-        "label": "pig intestine boiled",
+        "item": "bituka (small intestine)",
+        "label": "small intestine",
         "qty": 1.0,
         "unit": "lb",
-        "aisle": null
+        "aisle": "karne"
       },
       {
         "item": "atay ng baboy (pork liver)",
@@ -7748,8 +7748,8 @@
         "aisle": "gulay"
       },
       {
-        "item": "water chestnuts",
-        "label": "water chestnuts",
+        "item": "apulid (water chestnut)",
+        "label": "water chestnut",
         "qty": 0.5,
         "unit": "cup",
         "aisle": null
@@ -8059,11 +8059,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "bouillon cubes",
-        "label": "bouillon cubes",
+        "item": "bouillon cube",
+        "label": "bouillon cube",
         "qty": 2.0,
         "unit": null,
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "asin at paminta (salt and pepper)",
@@ -8179,7 +8179,7 @@
         "item": "sampalok (tamarind)",
         "label": "tamarind",
         "qty": 1.0,
-        "unit": null,
+        "unit": "pack",
         "aisle": "dry goods"
       },
       {
@@ -8317,11 +8317,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "kasubha",
-        "label": "kasubha",
+        "item": "kasubha (safflower)",
+        "label": "safflower",
         "qty": 1.0,
         "unit": "tbsp",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "chicharon (pork cracklings)",
@@ -8516,11 +8516,11 @@
         "aisle": "gulay"
       },
       {
-        "item": "picked saluyot",
-        "label": "picked saluyot",
+        "item": "saluyot (jute leaves)",
+        "label": "jute leaves",
         "qty": 0.25,
         "unit": "cup",
-        "aisle": null
+        "aisle": "gulay"
       },
       {
         "item": "magic sarap (all-in-one seasoning)",
@@ -8584,11 +8584,11 @@
         "aisle": "gulay"
       },
       {
-        "item": "miswa",
-        "label": "miswa",
+        "item": "misua (wheat vermicelli)",
+        "label": "wheat vermicelli",
         "qty": 1.0,
         "unit": "bunch",
-        "aisle": null
+        "aisle": "dry goods"
       }
     ]
   },
@@ -8856,11 +8856,11 @@
     "source": "https://panlasangpinoy.com/balbacua-recipe/",
     "ingredients": [
       {
-        "item": "cow trotters",
+        "item": "pata ng baka (cow trotters)",
         "label": "cow trotters",
         "qty": 5.0,
         "unit": "lb",
-        "aisle": null
+        "aisle": "karne"
       },
       {
         "item": "beef cube",
@@ -8884,11 +8884,11 @@
         "aisle": "gulay"
       },
       {
-        "item": "salted black beans",
+        "item": "tausi (salted black beans)",
         "label": "salted black beans",
         "qty": 3.0,
         "unit": "tbsp",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "sibuyas na mura (spring onion)",
@@ -9421,11 +9421,11 @@
         "aisle": "gulay"
       },
       {
-        "item": "knorr ginataang gulay recipe mix 40 grams each",
-        "label": "knorr ginataang gulay recipe mix 40 grams each",
+        "item": "ginataang gulay mix",
+        "label": "ginataang gulay mix",
         "qty": 2.0,
         "unit": "pack",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "baboy (pork)",
@@ -9496,11 +9496,11 @@
         "aisle": "gulay"
       },
       {
-        "item": "small red bellpepper",
-        "label": "small red bellpepper",
+        "item": "red bell pepper",
+        "label": "red bell pepper",
         "qty": 1.0,
         "unit": "piece",
-        "aisle": null
+        "aisle": "gulay"
       },
       {
         "item": "ginisa mix (saute seasoning)",
@@ -9510,11 +9510,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "florets of cauliflower",
-        "label": "florets of cauliflower",
+        "item": "cauliflower",
+        "label": "cauliflower",
         "qty": 0.5,
         "unit": "cup",
-        "aisle": null
+        "aisle": "gulay"
       },
       {
         "item": "karot (carrot)",
@@ -9620,11 +9620,11 @@
         "aisle": "gulay"
       },
       {
-        "item": "calabasa",
-        "label": "calabasa",
+        "item": "kalabasa (squash)",
+        "label": "squash",
         "qty": 0.5,
         "unit": "piece",
-        "aisle": null
+        "aisle": "gulay"
       },
       {
         "item": "baguio beans (green beans)",
@@ -9796,11 +9796,11 @@
         "aisle": "gulay"
       },
       {
-        "item": "top sirloin",
-        "label": "top sirloin",
+        "item": "baka (beef)",
+        "label": "beef",
         "qty": 0.5,
         "unit": "lb",
-        "aisle": null
+        "aisle": "karne"
       },
       {
         "item": "toyo (soy sauce)",
@@ -10479,7 +10479,7 @@
         "item": "togue (bean sprouts)",
         "label": "bean sprouts",
         "qty": 1.0,
-        "unit": null,
+        "unit": "pack",
         "aisle": "gulay"
       },
       {
@@ -10760,11 +10760,11 @@
     "source": "https://www.kawalingpinoy.com/atchara/",
     "ingredients": [
       {
-        "item": "unripe green papaya",
-        "label": "unripe green papaya",
+        "item": "hilaw na papaya (green papaya)",
+        "label": "green papaya",
         "qty": 1.0,
         "unit": "piece",
-        "aisle": null
+        "aisle": "gulay"
       },
       {
         "item": "asin (salt)",
@@ -10912,11 +10912,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "lechon sarsa",
-        "label": "lechon sarsa",
+        "item": "sarsa ng lechon (lechon sauce)",
+        "label": "lechon sauce",
         "qty": 0.5,
         "unit": "cup",
-        "aisle": null
+        "aisle": "dry goods"
       }
     ]
   },
@@ -10964,11 +10964,11 @@
         "aisle": "karne"
       },
       {
-        "item": "pig brain",
+        "item": "utak ng baboy (pig brain)",
         "label": "pig brain",
         "qty": 8.0,
         "unit": "oz",
-        "aisle": null
+        "aisle": "karne"
       },
       {
         "item": "kalamansi (calamansi)",
@@ -11154,11 +11154,11 @@
         "aisle": "karne"
       },
       {
-        "item": "about 1 cup boneless",
-        "label": "about 1 cup boneless",
+        "item": "dibdib ng manok (chicken breast)",
+        "label": "chicken breast",
         "qty": 0.25,
         "unit": "lb",
-        "aisle": null
+        "aisle": "karne"
       },
       {
         "item": "karot (carrot)",
@@ -11213,7 +11213,7 @@
         "item": "pancit canton (egg noodles)",
         "label": "egg noodles",
         "qty": 2.0,
-        "unit": null,
+        "unit": "pack",
         "aisle": "dry goods"
       }
     ]
@@ -11339,7 +11339,7 @@
         "aisle": "karne"
       },
       {
-        "item": "firm tofu",
+        "item": "tokwa (firm tofu)",
         "label": "firm tofu",
         "qty": 8.0,
         "unit": "oz",
@@ -11433,7 +11433,7 @@
         "item": "gawgaw (cornstarch)",
         "label": "cornstarch",
         "qty": 1.0,
-        "unit": null,
+        "unit": "pack",
         "aisle": "dry goods"
       }
     ]
@@ -12206,11 +12206,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "saffron threads",
-        "label": "saffron threads",
+        "item": "saffron",
+        "label": "saffron",
         "qty": 1.0,
         "unit": "tsp",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "hipon (shrimp)",
@@ -12271,7 +12271,7 @@
         "label": "chives",
         "qty": 2.0,
         "unit": "tbsp",
-        "aisle": null
+        "aisle": "gulay"
       },
       {
         "item": "langis ng linga (sesame oil)",
@@ -12483,11 +12483,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "a pinch of spanish saffron",
-        "label": "a pinch of spanish saffron",
+        "item": "saffron",
+        "label": "saffron",
         "qty": null,
         "unit": null,
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "asin at paminta (salt and pepper)",
@@ -12692,11 +12692,11 @@
         "aisle": "gulay"
       },
       {
-        "item": "dried wood ear soaked in water",
-        "label": "dried wood ear soaked in water",
+        "item": "tengang daga (wood ear mushroom)",
+        "label": "wood ear mushroom",
         "qty": 0.5,
         "unit": "cup",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "sibuyas (onion)",
@@ -12776,7 +12776,7 @@
         "label": "luncheon meat",
         "qty": 6.0,
         "unit": "oz",
-        "aisle": "karne"
+        "aisle": "dry goods"
       },
       {
         "item": "hotdog",
@@ -12848,7 +12848,7 @@
         "item": "macaroni",
         "label": "macaroni",
         "qty": 1.0,
-        "unit": null,
+        "unit": "pack",
         "aisle": "dry goods"
       },
       {
@@ -12940,7 +12940,7 @@
         "label": "italian seasoning",
         "qty": 0.5,
         "unit": "tsp",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "asin at paminta (salt and pepper)",
@@ -12989,7 +12989,7 @@
         "label": "nutmeg",
         "qty": 0.25,
         "unit": "tsp",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "asin at paminta (salt and pepper)",
@@ -13226,7 +13226,7 @@
         "item": "miki (fresh egg noodles)",
         "label": "fresh egg noodles",
         "qty": 1.0,
-        "unit": null,
+        "unit": "pack",
         "aisle": "dry goods"
       },
       {
@@ -13240,7 +13240,7 @@
         "item": "bihon (rice noodles)",
         "label": "rice noodles",
         "qty": 1.0,
-        "unit": null,
+        "unit": "pack",
         "aisle": "dry goods"
       },
       {
@@ -13300,11 +13300,11 @@
         "aisle": "gulay"
       },
       {
-        "item": "kecap manis",
-        "label": "kecap manis",
+        "item": "kecap manis (sweet soy sauce)",
+        "label": "sweet soy sauce",
         "qty": 0.25,
         "unit": "cup",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "asin at paminta (salt and pepper)",
@@ -13736,10 +13736,10 @@
         "aisle": "dry goods"
       },
       {
-        "item": "package 16 ounces block firm tofu",
-        "label": "package 16 ounces block firm tofu",
+        "item": "tokwa (firm tofu)",
+        "label": "firm tofu",
         "qty": 1.0,
-        "unit": null,
+        "unit": "pack",
         "aisle": null
       },
       {
@@ -13839,8 +13839,8 @@
         "aisle": "dry goods"
       },
       {
-        "item": "orange food coloring powder or annnato powder",
-        "label": "orange food coloring powder or annnato powder",
+        "item": "food coloring",
+        "label": "food coloring",
         "qty": 1.0,
         "unit": "tsp",
         "aisle": "dry goods"
@@ -14013,11 +14013,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "green papaya squeeze water out using a kitchen towel",
-        "label": "green papaya squeeze water out using a kitchen towel",
+        "item": "hilaw na papaya (green papaya)",
+        "label": "green papaya",
         "qty": 3.0,
         "unit": "cup",
-        "aisle": null
+        "aisle": "gulay"
       },
       {
         "item": "togue (bean sprouts)",
@@ -14092,7 +14092,7 @@
         "label": "ruffle fat",
         "qty": 2.0,
         "unit": "lb",
-        "aisle": null
+        "aisle": "karne"
       },
       {
         "item": "paminta (black pepper)",
@@ -14135,11 +14135,11 @@
     "source": "https://panlasangpinoy.com/adobong-isaw-recipe/",
     "ingredients": [
       {
-        "item": "pig or cow s small intestine",
-        "label": "pig or cow s small intestine",
+        "item": "bituka (small intestine)",
+        "label": "small intestine",
         "qty": 2.0,
         "unit": "lb",
-        "aisle": null
+        "aisle": "karne"
       },
       {
         "item": "toyo (soy sauce)",
@@ -14589,7 +14589,7 @@
         "aisle": "dry goods"
       },
       {
-        "item": "water chestnut",
+        "item": "apulid (water chestnut)",
         "label": "water chestnut",
         "qty": 1.0,
         "unit": "cup",
@@ -14666,11 +14666,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "package round shumai wrappers",
-        "label": "package round shumai wrappers",
+        "item": "balat ng siomai (wonton wrapper)",
+        "label": "wonton wrapper",
         "qty": 1.0,
-        "unit": null,
-        "aisle": null
+        "unit": "pack",
+        "aisle": "dry goods"
       },
       {
         "item": "kalamansi (calamansi)",
@@ -14825,11 +14825,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "lime",
+        "item": "dayap (lime)",
         "label": "lime",
         "qty": null,
         "unit": null,
-        "aisle": null
+        "aisle": "gulay"
       }
     ]
   },
@@ -14855,7 +14855,7 @@
         "label": "tapioca starch",
         "qty": 5.0,
         "unit": "tbsp",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "sibuyas na mura (spring onion)",
@@ -14890,7 +14890,7 @@
         "label": "vegetable broth",
         "qty": 6.0,
         "unit": "cup",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "asin (salt)",
@@ -14975,11 +14975,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "honey",
+        "item": "honey (pulot-pukyutan)",
         "label": "honey",
         "qty": 1.0,
         "unit": "tbsp",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "vanilla",
@@ -15372,11 +15372,11 @@
         "aisle": "gulay"
       },
       {
-        "item": "peanut",
-        "label": "peanut",
+        "item": "mani (peanuts)",
+        "label": "peanuts",
         "qty": 0.5,
         "unit": "cup",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "harina (flour)",
@@ -15839,11 +15839,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "sweetened beans garbanzo",
-        "label": "sweetened beans garbanzo",
+        "item": "sweetened beans (minatamis na beans)",
+        "label": "sweetened beans",
         "qty": 0.5,
         "unit": "cup",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "nata de coco",
@@ -15874,11 +15874,11 @@
         "aisle": "gulay"
       },
       {
-        "item": "sweetened macapuno",
-        "label": "sweetened macapuno",
+        "item": "macapuno",
+        "label": "macapuno",
         "qty": 0.25,
         "unit": "cup",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "ube (purple yam)",
@@ -16165,8 +16165,8 @@
         "aisle": "dry goods"
       },
       {
-        "item": "harina (flour)",
-        "label": "flour",
+        "item": "tapioca starch",
+        "label": "tapioca starch",
         "qty": 0.5,
         "unit": "cup",
         "aisle": "dry goods"
@@ -16318,6 +16318,13 @@
         "aisle": "dry goods"
       },
       {
+        "item": "mais (corn)",
+        "label": "corn",
+        "qty": 1.0,
+        "unit": "can",
+        "aisle": "gulay"
+      },
+      {
         "item": "asukal (sugar)",
         "label": "sugar",
         "qty": 0.5,
@@ -16377,11 +16384,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "nestlé carnation condesada",
-        "label": "nestlé carnation condesada",
+        "item": "gatas na kondensada (condensed milk)",
+        "label": "condensed milk",
         "qty": 0.333,
         "unit": "cup",
-        "aisle": null
+        "aisle": "dry goods"
       }
     ]
   },
@@ -16396,11 +16403,11 @@
     "source": "https://www.kawalingpinoy.com/halayang-ube/",
     "ingredients": [
       {
-        "item": "package 16 ounces frozen",
-        "label": "package 16 ounces frozen",
+        "item": "ube (purple yam)",
+        "label": "purple yam",
         "qty": 1.0,
-        "unit": null,
-        "aisle": null
+        "unit": "pack",
+        "aisle": "gulay"
       },
       {
         "item": "gata (coconut milk)",
@@ -16784,7 +16791,7 @@
         "label": "oreo cookies",
         "qty": 6.0,
         "unit": null,
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "mantikilya (butter)",
@@ -16804,11 +16811,11 @@
     "source": "https://www.kawalingpinoy.com/ube-cassava-cake/",
     "ingredients": [
       {
-        "item": "package 16 ounces frozen",
-        "label": "package 16 ounces frozen",
+        "item": "ube (purple yam)",
+        "label": "purple yam",
         "qty": 1.0,
-        "unit": null,
-        "aisle": null
+        "unit": "pack",
+        "aisle": "gulay"
       },
       {
         "item": "gatas na kondensada (condensed milk)",
@@ -16867,18 +16874,18 @@
         "aisle": "dry goods"
       },
       {
-        "item": "packages 16 ounces each frozen",
-        "label": "packages 16 ounces each frozen",
+        "item": "kasaba (cassava)",
+        "label": "cassava",
         "qty": 2.0,
-        "unit": null,
-        "aisle": null
+        "unit": "pack",
+        "aisle": "gulay"
       },
       {
-        "item": "macapuno strings",
-        "label": "macapuno strings",
+        "item": "macapuno",
+        "label": "macapuno",
         "qty": 1.0,
         "unit": "bottle",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "gata (coconut milk)",
@@ -16919,11 +16926,11 @@
     "source": "https://www.kawalingpinoy.com/pichi-pichi/",
     "ingredients": [
       {
-        "item": "package 16 ounces or two cups frozen",
-        "label": "package 16 ounces or two cups frozen",
+        "item": "kasaba (cassava)",
+        "label": "cassava",
         "qty": 1.0,
-        "unit": null,
-        "aisle": null
+        "unit": "pack",
+        "aisle": "gulay"
       },
       {
         "item": "niyog (coconut)",
@@ -16954,11 +16961,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "ube (purple yam)",
-        "label": "purple yam",
+        "item": "food coloring",
+        "label": "food coloring",
         "qty": 3.0,
         "unit": "drop",
-        "aisle": "gulay"
+        "aisle": "dry goods"
       },
       {
         "item": "pandan",
@@ -16992,11 +16999,11 @@
     "source": "https://www.kawalingpinoy.com/palitaw/",
     "ingredients": [
       {
-        "item": "sesame seeds",
+        "item": "linga (sesame seeds)",
         "label": "sesame seeds",
         "qty": 0.25,
         "unit": "cup",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "asukal (sugar)",
@@ -17018,13 +17025,6 @@
         "qty": 1.0,
         "unit": "cup",
         "aisle": "gulay"
-      },
-      {
-        "item": "water for boiling",
-        "label": "water for boiling",
-        "qty": null,
-        "unit": null,
-        "aisle": null
       }
     ]
   },
@@ -17039,11 +17039,11 @@
     "source": "https://www.kawalingpinoy.com/cassava-suman/",
     "ingredients": [
       {
-        "item": "packages 16 ounces each frozen",
-        "label": "packages 16 ounces each frozen",
+        "item": "kasaba (cassava)",
+        "label": "cassava",
         "qty": 2.0,
-        "unit": null,
-        "aisle": null
+        "unit": "pack",
+        "aisle": "gulay"
       },
       {
         "item": "asukal (sugar)",
@@ -17133,11 +17133,11 @@
         "aisle": "dry goods"
       },
       {
-        "item": "nestlé all purpose creamer",
-        "label": "nestlé all purpose creamer",
+        "item": "all purpose cream",
+        "label": "all purpose cream",
         "qty": 1.0,
         "unit": "pack",
-        "aisle": null
+        "aisle": "dry goods"
       },
       {
         "item": "gatas na kondensada (condensed milk)",
@@ -17223,25 +17223,25 @@
         "aisle": "dry goods"
       },
       {
-        "item": "fresh strawberries",
-        "label": "fresh strawberries",
+        "item": "strawberry",
+        "label": "strawberry",
         "qty": 1.0,
         "unit": "cup",
-        "aisle": null
+        "aisle": "gulay"
       },
       {
-        "item": "blueberries",
-        "label": "blueberries",
+        "item": "blueberry",
+        "label": "blueberry",
         "qty": 1.0,
         "unit": "cup",
-        "aisle": null
+        "aisle": "gulay"
       },
       {
         "item": "kiwi",
         "label": "kiwi",
         "qty": 3.0,
         "unit": "piece",
-        "aisle": null
+        "aisle": "gulay"
       },
       {
         "item": "nata de coco",
@@ -17296,10 +17296,10 @@
         "aisle": "dry goods"
       },
       {
-        "item": "packages 12 ounces each soft silken tofu",
-        "label": "packages 12 ounces each soft silken tofu",
+        "item": "silken tofu",
+        "label": "silken tofu",
         "qty": 2.0,
-        "unit": null,
+        "unit": "pack",
         "aisle": null
       }
     ]
@@ -17518,7 +17518,7 @@
         "item": "yeast (lebadura)",
         "label": "yeast",
         "qty": 1.0,
-        "unit": null,
+        "unit": "pack",
         "aisle": "dry goods"
       },
       {
@@ -17845,7 +17845,7 @@
         "item": "mais (corn)",
         "label": "corn",
         "qty": 2.0,
-        "unit": null,
+        "unit": "pack",
         "aisle": "gulay"
       },
       {

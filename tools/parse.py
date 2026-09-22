@@ -28,7 +28,7 @@ UNITS = {
               "large", "small", "whole"],
     "bunch": ["bunches", "bundle", "bundles"],
     "pack": ["packs", "packet", "packets", "sachet", "sachets", "pouch", "pouches",
-             "bag", "bags", "box", "boxes"],
+             "bag", "bags", "package", "packages", "box", "boxes"],
     "can": ["cans", "tin", "tins"],
     "bottle": ["bottles"],
     "stalk": ["stalks"],
@@ -55,7 +55,7 @@ PREP = re.compile(
     r"pounded|mashed|toasted|roasted|ground|softened|melted|thawed|deveined|"
     r"deboned|skinned|scaled|gutted|squeezed|strained|separated|divided|"
     r"finely|thinly|roughly|coarsely|lightly|freshly|optional|to taste|"
-    r"for frying|for garnish|for serving|as needed|see notes|plus more|if desired)\b",
+    r"for frying|for boiling|for garnish|for serving|as needed|see notes?|plus more|if desired)\b",
     re.I,
 )
 NUM = r"\d+(?:[.,]\d+)?(?:\s*/\s*\d+)?"
@@ -119,6 +119,10 @@ def parse_line(line):
             s = s[m.end():].strip()
             # "2 cups of water"
             s = re.sub(r"^of\b", "", s, flags=re.I).strip()
+            # "1 package (16 ounces each) ...", "1/4 pound (about 1 cup) ..." --
+            # a size spec between the unit and the item
+            s = re.sub(r"^(?:about\s+)?\d+\s*(?:ounces?|oz|grams?|g|ml|cups?)\b"
+                       r"(?:\s+each)?(?:\s+or\s+\w+\s+cups?)?\s*", "", s, flags=re.I)
 
     # First comma segment that is more than descriptors.
     item = s
@@ -129,7 +133,7 @@ def parse_line(line):
     # strip leading prep words ("sliced Leeks"), then cut at the first remaining one
     # ("long beans sitaw cut into 3-inch lengths" -> "long beans sitaw")
     while True:
-        m = PREP.match(item.strip())
+        m = PREP.match(item.strip()) or re.match(r"frozen\b", item.strip(), re.I)
         if not m:
             break
         item = item.strip()[m.end():]

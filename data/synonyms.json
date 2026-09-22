@@ -7,12 +7,22 @@
   ],
   "all purpose cream": [
     "all purpose cream",
+    "all purpose creamer",
     "all-purpose cream",
     "nestlé all purpose cream",
     "table cream"
   ],
   "ampalaya": [
     "bitter gourd"
+  ],
+  "anisado": [
+    "anisado",
+    "anisado wine",
+    "anise wine"
+  ],
+  "apulid": [
+    "water chestnut",
+    "water chestnuts"
   ],
   "asin": [
     "rock salt",
@@ -72,7 +82,13 @@
   "baka": [
     "beef",
     "beef brisket",
-    "beef chuck"
+    "beef chuck",
+    "chuck roast",
+    "ribeye",
+    "ribeye steak",
+    "sirloin",
+    "top round",
+    "top sirloin"
   ],
   "baking powder": [
     "baking powder"
@@ -82,6 +98,7 @@
     "spring roll wrappers"
   ],
   "balat ng siomai": [
+    "shumai wrappers",
     "wonton wrapper",
     "wonton wrappers"
   ],
@@ -108,6 +125,16 @@
   "bihon": [
     "rice noodles"
   ],
+  "bituka": [
+    "pig intestine",
+    "small intestine"
+  ],
+  "blueberry": [
+    "blueberries"
+  ],
+  "bouillon cube": [
+    "bouillon cubes"
+  ],
   "breadcrumbs": [
     "bread crumbs",
     "breadcrumbs",
@@ -131,6 +158,10 @@
   "buto-buto ng baboy": [
     "pork ribs"
   ],
+  "cauliflower": [
+    "cauliflower",
+    "florets of cauliflower"
+  ],
   "chicharon": [
     "chicharon",
     "pork cracklings",
@@ -145,12 +176,18 @@
     "chili flakes",
     "red chili pepper flakes"
   ],
+  "chili paste": [
+    "chili paste"
+  ],
   "chinese cooking wine": [
     "chinese cooking wine",
     "rice wine"
   ],
   "chinese sausage": [
     "chinese sausage"
+  ],
+  "chives": [
+    "chives"
   ],
   "chorizo": [
     "chorizo",
@@ -170,6 +207,10 @@
     "chili leaves",
     "pepper leaves"
   ],
+  "dayap": [
+    "lime",
+    "limes"
+  ],
   "dibdib ng manok": [
     "chicken breast",
     "chicken breasts"
@@ -182,6 +223,10 @@
     "anchovies",
     "dilis",
     "dried anchovies"
+  ],
+  "food coloring": [
+    "food coloring",
+    "red food coloring"
   ],
   "fruit cocktail": [
     "fruit cocktail",
@@ -218,6 +263,7 @@
   ],
   "gatas na kondensada": [
     "carnation condensada",
+    "carnation condesada",
     "condensed milk",
     "nestlé carnation condensada",
     "sweetened condensed milk"
@@ -225,6 +271,10 @@
   "gawgaw": [
     "corn starch",
     "cornstarch"
+  ],
+  "ginataang gulay mix": [
+    "ginataang gulay mix",
+    "ginataang gulay recipe mix"
   ],
   "giniling na baboy": [
     "ground pork"
@@ -237,8 +287,6 @@
     "saute seasoning"
   ],
   "gisantes": [
-    "frozen green peas",
-    "frozen sweet peas",
     "green peas",
     "peas",
     "sweet peas"
@@ -273,6 +321,11 @@
     "cake flour",
     "flour"
   ],
+  "hilaw na papaya": [
+    "green papaya",
+    "unripe green papaya",
+    "unripe papaya"
+  ],
   "hipon": [
     "large shrimp",
     "large shrimps",
@@ -285,6 +338,13 @@
     "chicken thigh",
     "chicken thighs"
   ],
+  "hog casings": [
+    "hog casings"
+  ],
+  "honey": [
+    "honey",
+    "pulot-pukyutan"
+  ],
   "hotdog": [
     "hot dogs",
     "hotdogs"
@@ -292,6 +352,9 @@
   "isda": [
     "fish",
     "fish fillet"
+  ],
+  "italian seasoning": [
+    "italian seasoning"
   ],
   "itlog": [
     "egg",
@@ -327,6 +390,7 @@
     "coconut cream kakang gata"
   ],
   "kalabasa": [
+    "calabasa",
     "squash"
   ],
   "kalamansi": [
@@ -383,15 +447,24 @@
     "cashews",
     "unsalted cashews"
   ],
+  "kasubha": [
+    "kasubha",
+    "safflower"
+  ],
   "katas ng pinya": [
     "pineapple juice"
+  ],
+  "kecap manis": [
+    "kecap manis",
+    "sweet soy sauce"
   ],
   "keso": [
     "american processed cheese",
     "cheddar cheese",
     "cheese",
     "processed cheese",
-    "processed cheese eden brand"
+    "processed cheese eden brand",
+    "sharp cheddar"
   ],
   "keso de bola": [
     "edam cheese"
@@ -402,6 +475,9 @@
   ],
   "kintsay": [
     "celery"
+  ],
+  "kiwi": [
+    "kiwi"
   ],
   "labanos": [
     "daikon",
@@ -440,6 +516,9 @@
   "lihiya": [
     "lye water"
   ],
+  "linga": [
+    "sesame seeds"
+  ],
   "liquid seasoning": [
     "knorr liquid seasoning",
     "liquid seasoning"
@@ -450,6 +529,9 @@
   "longganisa": [
     "longganisa"
   ],
+  "luncheon meat": [
+    "luncheon meat"
+  ],
   "luya": [
     "fresh ginger",
     "ginger"
@@ -457,6 +539,11 @@
   "luyang dilaw": [
     "turmeric",
     "turmeric powder"
+  ],
+  "macapuno": [
+    "macapuno",
+    "macapuno strings",
+    "sweetened macapuno"
   ],
   "macaroni": [
     "elbow macaroni",
@@ -489,6 +576,7 @@
     "ripe mango"
   ],
   "mani": [
+    "peanut",
     "peanuts"
   ],
   "manok": [
@@ -509,25 +597,42 @@
   "mantikilya ng mani": [
     "peanut butter"
   ],
+  "mayonesa": [
+    "mayonnaise"
+  ],
   "miki": [
     "fresh egg noodles",
     "miki noodles"
   ],
+  "miso": [
+    "miso",
+    "miso paste"
+  ],
   "misua": [
+    "miswa",
     "wheat vermicelli"
   ],
   "monggo": [
     "mung beans"
+  ],
+  "mustasa": [
+    "mustard greens"
   ],
   "nata de coco": [
     "coconut gel",
     "coconut gel nata de coco",
     "nata de coco"
   ],
+  "nguso ng baboy": [
+    "pig snout"
+  ],
   "niyog": [
     "coconut",
     "desiccated coconut",
     "mature coconut"
+  ],
+  "nutmeg": [
+    "nutmeg"
   ],
   "okra": [
     "okra"
@@ -535,6 +640,10 @@
   "olive oil": [
     "extra virgin olive oil",
     "olive oil"
+  ],
+  "oreo cookies": [
+    "oreo",
+    "oreo cookies"
   ],
   "oyster sauce": [
     "maggi oyster sauce",
@@ -570,6 +679,10 @@
   "pata": [
     "pork hock",
     "pork leg"
+  ],
+  "pata ng baka": [
+    "cow trotters",
+    "ox feet"
   ],
   "patatas": [
     "potato",
@@ -632,10 +745,14 @@
     "egg whites"
   ],
   "red bell pepper": [
-    "red bell pepper"
+    "red bell pepper",
+    "red bellpepper"
   ],
   "repolyo": [
     "cabbage"
+  ],
+  "ruffle fat": [
+    "ruffle fat"
   ],
   "sabaw ng baka": [
     "beef broth"
@@ -644,9 +761,15 @@
     "chicken broth",
     "chicken stock"
   ],
+  "saffron": [
+    "saffron",
+    "saffron threads",
+    "spanish saffron"
+  ],
   "saging": [
     "banana",
     "bananas",
+    "plantains",
     "saba",
     "saba banana",
     "saba bananas"
@@ -659,18 +782,27 @@
   "salmon": [
     "salmon"
   ],
+  "saluyot": [
+    "jute leaves",
+    "saluyot"
+  ],
   "sampalok": [
     "maggi magic sinigang",
     "maggi magic sinigang original sampalok mix",
     "sampaloc",
     "sampalok mix",
     "sinigang mix",
+    "sinigang powder",
     "sinigang sa sampaloc mix",
     "tamarind",
     "young tamarind"
   ],
   "sarsa ng kamatis": [
     "tomato sauce"
+  ],
+  "sarsa ng lechon": [
+    "lechon sarsa",
+    "lechon sauce"
   ],
   "sayote": [
     "chayote"
@@ -705,10 +837,12 @@
   "siling haba": [
     "banana pepper",
     "finger chili",
+    "finger chilies",
     "long green chili",
     "long green chili siling pansigang",
     "long green pepper",
     "long green pepper siling pansigang",
+    "long green peppers",
     "siling panigang",
     "siling pansigang"
   ],
@@ -722,6 +856,9 @@
     "thai chili pepper",
     "thai chili peppers",
     "thai chili peppers stemmed"
+  ],
+  "silken tofu": [
+    "silken tofu"
   ],
   "singkamas": [
     "jicama"
@@ -753,14 +890,23 @@
   "star anise": [
     "star anise"
   ],
+  "strawberry": [
+    "fresh strawberries",
+    "strawberries"
+  ],
   "sugpo": [
     "prawn"
   ],
   "suka": [
     "cane vinegar",
     "spiced vinegar",
+    "sukang iloko",
     "vinegar",
     "white vinegar"
+  ],
+  "sweetened beans": [
+    "minatamis na beans",
+    "sweetened beans"
   ],
   "taba ng baboy": [
     "lard",
@@ -769,6 +915,9 @@
   "tahong": [
     "mussels",
     "tahong"
+  ],
+  "tainga ng baboy": [
+    "pig ears"
   ],
   "talong": [
     "chinese eggplant",
@@ -780,6 +929,19 @@
   ],
   "tanigue": [
     "spanish mackerel"
+  ],
+  "tapioca starch": [
+    "tapioca flour",
+    "tapioca starch"
+  ],
+  "tausi": [
+    "salted black beans",
+    "tausi"
+  ],
+  "tengang daga": [
+    "dried wood ear",
+    "wood ear",
+    "wood ear mushroom"
   ],
   "tilapia": [
     "tilapia"
@@ -793,6 +955,9 @@
   ],
   "togue": [
     "bean sprouts"
+  ],
+  "tokwa": [
+    "firm tofu"
   ],
   "tomato paste": [
     "tomato paste"
@@ -834,10 +999,23 @@
   "upo": [
     "bottle gourd"
   ],
+  "utak ng baboy": [
+    "pig brain"
+  ],
   "vanilla": [
     "vanilla",
     "vanilla essence",
     "vanilla extract"
+  ],
+  "vegetable broth": [
+    "vegetable broth"
+  ],
+  "vienna sausage": [
+    "vienna sausage",
+    "vienna sausages"
+  ],
+  "white wine": [
+    "white wine"
   ],
   "wombok": [
     "napa cabbage"
