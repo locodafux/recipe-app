@@ -1,17 +1,23 @@
 // Three tabs (Dishes · List · History); Recipe detail and Shopping open over them, Shopping with no tab bar.
-// ponytail: state-based navigation, no router. Move to expo-router when invites need deep links.
+// ponytail: state-based navigation, no router. The one deep link (a magic link, maybe carrying an invite)
+// is read with expo-linking; move to expo-router if the app grows real routes.
 import { Ionicons } from '@expo/vector-icons';
+import * as Linking from 'expo-linking';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useMemo, useState } from 'react';
-import { BackHandler, Pressable, Text, View } from 'react-native';
+import { Alert, BackHandler, Platform, Pressable, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { BY_ID, INDEX } from './src/data.ts';
 import { merge } from './src/merge.ts';
+import { ensureList, openLink, useSync, type InvitePreview } from './src/remote.ts';
 import { Browse } from './src/screens/Browse.tsx';
+import { Invite } from './src/screens/Invite.tsx';
+import { Join } from './src/screens/Join.tsx';
 import { ListTab, type Segment } from './src/screens/ListTab.tsx';
 import { RecipeDetail } from './src/screens/RecipeDetail.tsx';
 import { Shopping } from './src/screens/Shopping.tsx';
 import { hydrate, useStore } from './src/store.ts';
+import { rowsToLines } from './src/sync.ts';
 import { C, Header, s } from './src/ui.tsx';
 
 type Tab = 'dishes' | 'list' | 'history';
@@ -30,24 +36,43 @@ export default function App() {
 }
 
 function Main() {
-  const { week } = useStore();
+  const { week, shared } = useStore();
   const [tab, setTab] = useState<Tab>('dishes');
   const [segment, setSegment] = useState<Segment>('dishes');
   const [detail, setDetail] = useState<string | null>(null);
   const [shopping, setShopping] = useState(false);
+  const [inviting, setInviting] = useState(false);
+  const [join, setJoin] = useState<InvitePreview | null>(null);
 
   const lines = useMemo(() => merge(week.map((id) => BY_ID.get(id)).filter((r) => r !== undefined), INDEX), [week]);
+  // While a list is shared, both phones shop from its rows, so they see the same items.
+  const shopLines = useMemo(() => (shared?.rows.length ? rowsToLines(shared.rows) : lines), [shared?.rows, lines]);
+  useSync(shared?.id);
+
+  const url = Linking.useURL();
+  useEffect(() => {
+    if (!url) return;
+    openLink(url).then((r) => {
+      if (r?.error) return Platform.OS === 'web' ? window.alert(r.error) : Alert.alert('That link did not work', r.error);
+      if (r?.invite) setJoin(r.invite);
+    });
+  }, [url]);
+  const shop = () => { ensureList(lines); setShopping(true); };
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (join) return setJoin(null), true;
+      if (inviting) return setInviting(false), true;
       if (shopping) return setShopping(false), true;
       if (detail) return setDetail(null), true;
       return false;
     });
     return () => sub.remove();
-  }, [shopping, detail]);
+  }, [shopping, detail, inviting, join]);
 
-  if (shopping) return <SafeBottom><Shopping lines={lines} onClose={() => setShopping(false)} /></SafeBottom>;
+  if (join) return <SafeBottom><Join invite={join} onBack={() => setJoin(null)} onJoined={() => { setJoin(null); setShopping(true); }} /></SafeBottom>;
+  if (inviting) return <SafeBottom><Invite lines={shopLines} onBack={() => setInviting(false)} /></SafeBottom>;
+  if (shopping) return <SafeBottom><Shopping lines={shopLines} onClose={() => setShopping(false)} onInvite={() => setInviting(true)} /></SafeBottom>;
   if (detail) return <SafeBottom><RecipeDetail id={detail} onBack={() => setDetail(null)} /></SafeBottom>;
 
   return (
@@ -58,7 +83,7 @@ function Main() {
         )}
         {tab === 'list' && (
           <ListTab lines={lines} segment={segment} setSegment={setSegment} onBrowse={() => setTab('dishes')}
-            onOpen={setDetail} onShop={() => setShopping(true)} />
+            onOpen={setDetail} onShop={shop} onShared={() => setShopping(true)} />
         )}
         {tab === 'history' && (
           <View style={s.screen}>

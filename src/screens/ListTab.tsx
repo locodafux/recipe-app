@@ -10,10 +10,11 @@ import { LineRow, dishCount } from './LineRow.tsx';
 
 export type Segment = 'dishes' | 'market';
 
-export function ListTab({ lines, segment, setSegment, onBrowse, onOpen, onShop }: {
-  lines: Line[]; segment: Segment; setSegment: (s: Segment) => void; onBrowse: () => void; onOpen: (id: string) => void; onShop: () => void;
+export function ListTab({ lines, segment, setSegment, onBrowse, onOpen, onShop, onShared }: {
+  lines: Line[]; segment: Segment; setSegment: (s: Segment) => void; onBrowse: () => void; onOpen: (id: string) => void;
+  onShop: () => void; onShared: () => void;
 }) {
-  const { week, ticks } = useStore();
+  const { week, ticks, shared } = useStore();
   const [open, setOpen] = useState<string | null>(null);
   const dishes = week.map((id) => BY_ID.get(id)).filter((r) => r !== undefined);
   const merged = lines.filter((l) => dishCount(l) > 1).length;
@@ -27,7 +28,8 @@ export function ListTab({ lines, segment, setSegment, onBrowse, onOpen, onShop }
         <View style={s.empty}>
           <Text style={{ fontSize: 40 }}>🧺</Text>
           <Text style={s.emptyText}>Pick the dishes you want to cook this week and their ingredients land here as one market list.</Text>
-          <Button small title="Browse dishes" onPress={onBrowse} style={{ alignSelf: 'stretch', marginTop: 8 }} />
+          {shared && <Button small icon="cart" title={`Open ${shared.name}`} onPress={onShared} style={{ alignSelf: 'stretch', marginTop: 8 }} />}
+          <Button small kind={shared ? 'secondary' : 'primary'} title="Browse dishes" onPress={onBrowse} style={{ alignSelf: 'stretch', marginTop: 8 }} />
         </View>
       </View>
     );

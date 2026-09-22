@@ -97,6 +97,16 @@ select pg_temp.eq((select row(checked, checked_by, checked_at)::text from list_i
 -- Items stay put.
 select pg_temp.fails($$update list_items set list_id = gen_random_uuid() where id = '22222222-0000-0000-0000-000000000002'$$, 'cannot move');
 
+-- A pending invite can be cancelled; an accepted one cannot, and outsiders cannot touch either.
+with i as (insert into invites (list_id, email) values ('11111111-0000-0000-0000-000000000000', 'dan@example.com') returning token)
+select set_config('check.dan_token', (select token::text from i), true);
+select pg_temp.login('00000000-0000-0000-0000-00000000000e');
+delete from invites;
+select pg_temp.login('00000000-0000-0000-0000-00000000000a');
+select pg_temp.eq((select count(*) from invites), 3::bigint, 'eve cancels nothing');
+delete from invites where email in ('dan@example.com', 'bob@example.com');
+select pg_temp.eq((select string_agg(email, ',' order by email) from invites), 'bob@example.com,carol@example.com', 'only pending invite cancelled');
+
 -- Alice archives the list: it and its items are now frozen history.
 update lists set archived_at = now() where id = '11111111-0000-0000-0000-000000000000';
 select pg_temp.fails($$update lists set archived_at = null$$, 'archived');

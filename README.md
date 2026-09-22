@@ -99,7 +99,7 @@ These two requirements fight each other, so the rule is explicit:
 
 ```
 lists        id, name, created_at, archived_at
-list_items   id, list_id, item, qty, unit, aisle, checked, checked_by, checked_at
+list_items   id, list_id, item, label, dishes, position, qty, unit, aisle, checked, checked_by, checked_at
 list_members id, list_id, user_id, role
 invites      id, list_id, email, token, accepted_at
 ```

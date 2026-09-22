@@ -1,17 +1,29 @@
-// Local-first state: this week's dishes and shopping ticks, persisted on the phone.
-// No network code. A later sync task flushes ticks via pendingTicks()/markSynced().
+// Local-first state: this week's dishes, shopping ticks and the cached shared list, persisted on the phone.
+// No network code: src/remote.ts flushes ticks via pendingTicks()/markSynced() and feeds in applyRows().
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSyncExternalStore } from 'react';
+import { applyRemote, type Row, type Tick } from './sync.ts';
 
-export type Tick = { at: number; synced: boolean };
+export type { Tick };
+
+/** The Supabase list this trip is shared on, cached so shopping still works with no signal. */
+export type Shared = {
+  id: string;
+  name: string;
+  rows: Row[];
+  me: string; // this phone's user id
+  owner: boolean; // this phone created the list (the other one joined by invite)
+  partner?: { id?: string; email: string };
+};
 
 type State = {
   week: string[]; // recipe ids, in the order they were added
   ticks: Record<string, Tick>; // keyed by merge key (Line.key)
+  shared: Shared | null;
 };
 
 const KEY = 'recipe-app/state/v1';
-let state: State = { week: [], ticks: {} };
+let state: State = { week: [], ticks: {}, shared: null };
 const listeners = new Set<() => void>();
 
 function set(next: State) {
@@ -28,6 +40,8 @@ export async function hydrate() {
     console.warn('load failed', e);
   }
 }
+
+export const getState = () => state;
 
 export function useStore(): State {
   return useSyncExternalStore(
@@ -71,7 +85,26 @@ export function markSynced(keys: string[]) {
   set({ ...state, ticks });
 }
 
-/** Ends the trip. Archiving to History (M5) hooks in here. */
+/** Start sharing on a list. Joining someone else's list replaces this phone's own trip. */
+export function setShared(shared: Shared | null, resetTicks = false) {
+  const ticks = resetTicks ? {} : state.ticks;
+  set({ ...state, shared, ticks: shared ? applyRemote(ticks, shared.rows, shared.me) : ticks });
+}
+
+export function setPartner(partner: Shared['partner']) {
+  if (state.shared) set({ ...state, shared: { ...state.shared, partner } });
+}
+
+/** Rows from the server (a fetch or a realtime event): update the cache and OR their ticks in. */
+export function applyRows(listId: string, rows: Row[]) {
+  const shared = state.shared;
+  if (!shared || shared.id !== listId) return;
+  const byId = new Map(shared.rows.map((r) => [r.id, r]));
+  for (const r of rows) byId.set(r.id, r);
+  set({ ...state, shared: { ...shared, rows: [...byId.values()] }, ticks: applyRemote(state.ticks, rows, shared.me) });
+}
+
+/** Ends the trip and stops sharing its list. Archiving to History (M5) hooks in here. */
 export function finishShopping() {
-  set({ ...state, ticks: {} });
+  set({ ...state, ticks: {}, shared: null });
 }
