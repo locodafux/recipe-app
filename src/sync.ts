@@ -21,6 +21,42 @@ export type Row = {
 /** `by` is the partner's user id; absent means this phone ticked it. */
 export type Tick = { at: number; synced: boolean; by?: string };
 export type Ticks = Record<string, Tick>;
+/** A queued "not bought": `by` is who ticked what was unchecked, so it can only undo that tick (see flush). */
+export type Untick = { at: number; by?: string };
+export type Unticks = Record<string, Untick>;
+/** One entry of the pending queue: send `checked` for `key`. */
+export type Pending = { key: string; at: number; checked: boolean; by?: string };
+
+/**
+ * A tap on a row: ticks it, or unchecks a ticked one. Local and immediate either way; the change joins the
+ * pending queue, replacing any unsent change to the same item, so the queue holds each item's latest tap.
+ */
+export function toggle({ ticks, unticks }: { ticks: Ticks; unticks: Unticks }, key: string, at: number) {
+  const { [key]: t, ...restTicks } = ticks;
+  const { [key]: _, ...restUnticks } = unticks;
+  return t
+    ? { ticks: restTicks, unticks: { ...restUnticks, [key]: { at, by: t.by } } }
+    : { ticks: { ...ticks, [key]: { at, synced: false } }, unticks: restUnticks };
+}
+
+/** The pending queue, oldest first: ticks and unchecks this phone has not yet sent. */
+export function pending(ticks: Ticks, unticks: Unticks): Pending[] {
+  return [
+    ...Object.entries(ticks).filter(([, t]) => !t.synced).map(([key, t]) => ({ key, at: t.at, checked: true })),
+    ...Object.entries(unticks).map(([key, u]) => ({ key, at: u.at, checked: false, by: u.by })),
+  ].sort((a, b) => a.at - b.at);
+}
+
+/** These reached the server. An item tapped again since (a different `at`) stays queued. */
+export function markSent({ ticks, unticks }: { ticks: Ticks; unticks: Unticks }, sent: Pending[]) {
+  const t = { ...ticks };
+  const u = { ...unticks };
+  for (const p of sent) {
+    if (p.checked && t[p.key]?.at === p.at) t[p.key] = { ...t[p.key], synced: true };
+    if (!p.checked && u[p.key]?.at === p.at) delete u[p.key];
+  }
+  return { ticks: t, unticks: u };
+}
 
 /** `start` continues the numbering when lines are added to a list that already has rows. */
 export function linesToRows(lines: Line[], listId: string, start = 0): Row[] {
@@ -46,36 +82,42 @@ export function rowsToLines(rows: Row[]): Line[] {
 }
 
 /**
- * OR merge of server rows into local ticks. A checked row ticks the item (credited to whoever the server
- * says reached it first) and ends undo for a local tick of the same item. An unchecked row never
- * removes a local tick: that tick is simply still queued.
+ * Merge of server rows into local ticks. A checked row ticks the item, credited to whoever the server says
+ * reached it first, and marks a local tick of it sent. An unchecked row clears a sent tick (someone unchecked
+ * it) but never a queued one: that tick is still on its way. A checked row never brings back an item whose
+ * uncheck is still queued here; once the uncheck is sent, the server has the final say.
  */
-export function applyRemote(ticks: Ticks, rows: Row[], me: string | undefined): Ticks {
+export function applyRemote(ticks: Ticks, rows: Row[], me: string | undefined, unticks: Unticks = {}): Ticks {
   let next = ticks;
   for (const r of rows) {
-    if (!r.checked) continue;
     const t = next[r.item];
-    if (t?.synced) continue;
+    if (!r.checked) {
+      if (t?.synced) {
+        const { [r.item]: _, ...rest } = next;
+        next = rest;
+      }
+      continue;
+    }
+    if (t?.synced || unticks[r.item]) continue;
     const by = r.checked_by && r.checked_by !== me ? r.checked_by : undefined;
-    next = { ...next, [r.item]: t ? { ...t, synced: true } : { at: r.checked_at ? Date.parse(r.checked_at) : Date.now(), synced: true, by } };
+    next = { ...next, [r.item]: { at: t?.at ?? (r.checked_at ? Date.parse(r.checked_at) : Date.now()), synced: true, by } };
   }
   return next;
 }
 
 /**
- * Sends queued ticks oldest first, one at a time, and returns the keys that reached the server.
- * Stops at the first failure so a later tick is never marked sent while an older one is still queued.
- * Only ever sends "checked"; an undone tick left the queue before this runs.
+ * Sends the queue oldest first, one at a time, and returns the entries that reached the server.
+ * Stops at the first failure so a later change is never marked sent while an older one is still queued.
  */
-export async function flush(pending: { key: string }[], send: (key: string) => Promise<void>): Promise<string[]> {
-  const sent: string[] = [];
-  for (const { key } of pending) {
+export async function flush(queue: Pending[], send: (p: Pending) => Promise<void>): Promise<Pending[]> {
+  const sent: Pending[] = [];
+  for (const p of queue) {
     try {
-      await send(key);
+      await send(p);
     } catch {
       break;
     }
-    sent.push(key);
+    sent.push(p);
   }
   return sent;
 }

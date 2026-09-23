@@ -83,9 +83,10 @@ TheMealDB stays as an explicit **"Search more recipes"** button from M2 — onli
 
 These two requirements fight each other, so the rule is explicit:
 
-- **Local-first.** Every tick writes to the phone immediately and shows immediately. The market is exactly where signal dies; the app must never wait on the network to check off an onion.
-- **Sync on reconnect.** Queued ticks flush to Supabase when signal returns; Realtime pushes the other person's ticks in.
+- **Local-first.** Every tick, and every uncheck, writes to the phone immediately and shows immediately. The market is exactly where signal dies; the app must never wait on the network to check off an onion.
+- **Sync on reconnect.** Queued ticks and unchecks flush to Supabase in the order they were tapped when signal returns; Realtime pushes the other person's in.
 - **Conflicts resolve by OR, not by clock.** If *either* person checked an item, it is checked. You cannot un-buy something by having a slower phone. This makes conflict resolution one line and rules out ever needing a CRDT library.
+- **A misclick can be taken back.** Tapping a ticked item unchecks it, on both phones, even after the tick was shared. This deliberately replaces the earlier rule (design call D5) that a tick could only be undone while still queued on the phone. The OR rule above still holds, because an uncheck is a tap on one particular tick: it only undoes that tick. If the other person has bought the item since, a late uncheck changes nothing and their tick stands.
 
 ### Joining a list
 
@@ -104,7 +105,7 @@ list_members id, list_id, user_id, role
 invites      id, list_id, email, token, accepted_at
 ```
 
-`checked` is a boolean that only ever goes false→true during a shopping trip. Archiving is an explicit action, not a sync outcome.
+`checked` goes false→true on a tick and back to false only on a deliberate uncheck; the first tick to reach the server keeps `checked_by`/`checked_at`. Archiving is an explicit action, not a sync outcome.
 
 ---
 

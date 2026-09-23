@@ -1,11 +1,11 @@
 // Local-first state: this week's dishes, shopping ticks and the cached shared list, persisted on the phone.
-// No network code: src/remote.ts flushes ticks via pendingTicks()/markSynced() and feeds in applyRows().
+// No network code: src/remote.ts flushes ticks and unchecks via pendingTicks()/markSynced() and feeds in applyRows().
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSyncExternalStore } from 'react';
 import { CHANGELOG } from './changelog.ts';
 import { mergeHistory, repeatIds, tripFromLines, tripFromRows, type Trip } from './history.ts';
 import type { Line } from './merge.ts';
-import { applyRemote, type Row, type Tick } from './sync.ts';
+import { applyRemote, markSent, pending, toggle, type Pending, type Row, type Tick, type Unticks } from './sync.ts';
 
 export type { Tick };
 
@@ -22,6 +22,7 @@ export type Shared = {
 type State = {
   week: string[]; // recipe ids, in the order they were added
   ticks: Record<string, Tick>; // keyed by merge key (Line.key)
+  unticks: Unticks; // queued unchecks, keyed like ticks
   shared: Shared | null;
   seen?: string; // newest What's new entry shown (src/whatsnew.ts)
   history: Trip[]; // finished trips, newest first
@@ -29,7 +30,7 @@ type State = {
 };
 
 const KEY = 'recipe-app/state/v1';
-let state: State = { week: [], ticks: {}, shared: null, history: [], archiving: [] };
+let state: State = { week: [], ticks: {}, unticks: {}, shared: null, history: [], archiving: [] };
 const listeners = new Set<() => void>();
 
 function set(next: State) {
@@ -66,53 +67,40 @@ export function toggleDish(id: string) {
   set({ ...state, week });
 }
 
-/** Tick an item bought. Writes locally at once and joins the pending queue. */
-export function tick(key: string) {
-  if (state.ticks[key]) return;
-  set({ ...state, ticks: { ...state.ticks, [key]: { at: Date.now(), synced: false } } });
+/**
+ * A tap on a shopping row: ticks it bought, or unchecks it if it is ticked (D5, revised: any tick can be
+ * unchecked, not only one still queued). Writes locally at once and joins the pending queue.
+ */
+export function toggleTick(key: string) {
+  set({ ...state, ...toggle(state, key, Date.now()) });
 }
 
-/** D5: undo is only allowed while the tick is still queued locally. Once synced, OR wins (README 4). */
-export const canUndo = (key: string) => state.ticks[key]?.synced === false;
+/** The pending queue, oldest first: ticks and unchecks this phone has not yet sent. */
+export const pendingTicks = (): Pending[] => pending(state.ticks, state.unticks);
 
-export function undo(key: string) {
-  if (!canUndo(key)) return;
-  const { [key]: _, ...ticks } = state.ticks;
-  set({ ...state, ticks });
-}
-
-/** The pending queue, oldest first: ticks this phone has not yet sent. */
-export function pendingTicks(): { key: string; at: number }[] {
-  return Object.entries(state.ticks)
-    .filter(([, t]) => !t.synced)
-    .map(([key, t]) => ({ key, at: t.at }))
-    .sort((a, b) => a.at - b.at);
-}
-
-/** Called by the sync task once these ticks have reached the server; they can no longer be undone. */
-export function markSynced(keys: string[]) {
-  const ticks = { ...state.ticks };
-  for (const k of keys) if (ticks[k]) ticks[k] = { ...ticks[k], synced: true };
-  set({ ...state, ticks });
+/** Called by the sync task once these have reached the server. */
+export function markSynced(sent: Pending[]) {
+  set({ ...state, ...markSent(state, sent) });
 }
 
 /** Start sharing on a list. Joining someone else's list replaces this phone's own trip. */
 export function setShared(shared: Shared | null, resetTicks = false) {
   const ticks = resetTicks ? {} : state.ticks;
-  set({ ...state, shared, ticks: shared ? applyRemote(ticks, shared.rows, shared.me) : ticks });
+  const unticks = resetTicks ? {} : state.unticks;
+  set({ ...state, shared, unticks, ticks: shared ? applyRemote(ticks, shared.rows, shared.me, unticks) : ticks });
 }
 
 export function setPartner(partner: Shared['partner']) {
   if (state.shared) set({ ...state, shared: { ...state.shared, partner } });
 }
 
-/** Rows from the server (a fetch or a realtime event): update the cache and OR their ticks in. */
+/** Rows from the server (a fetch or a realtime event): update the cache and merge their ticks in (sync.ts applyRemote). */
 export function applyRows(listId: string, rows: Row[]) {
   const shared = state.shared;
   if (!shared || shared.id !== listId) return;
   const byId = new Map(shared.rows.map((r) => [r.id, r]));
   for (const r of rows) byId.set(r.id, r);
-  set({ ...state, shared: { ...shared, rows: [...byId.values()] }, ticks: applyRemote(state.ticks, rows, shared.me) });
+  set({ ...state, shared: { ...shared, rows: [...byId.values()] }, ticks: applyRemote(state.ticks, rows, shared.me, state.unticks) });
 }
 
 /**
@@ -123,8 +111,8 @@ export function applyRows(listId: string, rows: Row[]) {
 export function finishShopping(lines: Line[], now = new Date()) {
   const { shared, ticks } = state;
   const trip = tripFromLines(shared?.id ?? `local-${now.getTime()}`, now, lines, Object.keys(ticks));
-  const archiving = shared ? [...state.archiving, { id: shared.id, ticks: pendingTicks().map((t) => t.key) }] : state.archiving;
-  set({ ...state, week: !shared || shared.owner ? [] : state.week, ticks: {}, shared: null, archiving, history: mergeHistory(state.history, [trip]) });
+  const archiving = shared ? [...state.archiving, { id: shared.id, ticks: pendingTicks().filter((p) => p.checked).map((p) => p.key) }] : state.archiving;
+  set({ ...state, week: !shared || shared.owner ? [] : state.week, ticks: {}, unticks: {}, shared: null, archiving, history: mergeHistory(state.history, [trip]) });
 }
 
 /**
@@ -134,7 +122,7 @@ export function finishShopping(lines: Line[], now = new Date()) {
 export function closeArchived(listId: string, archivedAt: string, rows: Row[]) {
   const { shared } = state;
   if (shared?.id !== listId) return;
-  set({ ...state, week: shared.owner ? [] : state.week, ticks: {}, shared: null, history: mergeHistory(state.history, [tripFromRows(listId, archivedAt, rows)]) });
+  set({ ...state, week: shared.owner ? [] : state.week, ticks: {}, unticks: {}, shared: null, history: mergeHistory(state.history, [tripFromRows(listId, archivedAt, rows)]) });
 }
 
 export function archived(listId: string) {
@@ -151,5 +139,5 @@ export function setRemoteHistory(trips: Trip[]) {
  * A shared list still in progress keeps its ticks; it takes the new dishes like any other edit.
  */
 export function repeatTrip(trip: Trip, idByName: Map<string, string>) {
-  set({ ...state, week: repeatIds(trip, idByName), ticks: state.shared ? state.ticks : {} });
+  set({ ...state, week: repeatIds(trip, idByName), ...(state.shared ? {} : { ticks: {}, unticks: {} }) });
 }

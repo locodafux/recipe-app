@@ -1,5 +1,5 @@
 #!/bin/sh
-# Proves RLS isolation, the checked false->true rule and the invite flow.
+# Proves RLS isolation, the tick and uncheck rules, the invite flow and archiving.
 #   DB_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres supabase/check/check.sh
 # runs against a `supabase start` stack (migrations already applied). Without
 # DB_URL it applies the migrations to a throwaway local Postgres instead.

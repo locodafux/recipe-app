@@ -64,8 +64,8 @@ npx expo start      # add --web to check screens in a browser
   imports out of them.
 - The UI is English. Show `displayName()` (English label, else `item`), never the
   canonical merge key.
-- All tick state goes through `src/store.ts` (AsyncStorage). `src/remote.ts` flushes it
-  via `pendingTicks()` / `markSynced()`; D5 undo is allowed only while a tick is unsynced.
+- All tick state goes through `src/store.ts` (AsyncStorage). `src/remote.ts` flushes ticks and unchecks
+  via `pendingTicks()` / `markSynced()`. Any tick can be unchecked (D5 revised, README section 4).
 - `CI=1 expo start` turns off Metro's file watcher: edits will not reach the bundle.
 
 ## What's new (before every APK build)
@@ -115,18 +115,17 @@ supabase start && supabase db reset     # full local stack (needs Docker)
 DB_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres supabase/check/check.sh
 ```
 
-`check.sh` proves RLS isolation, the false→true tick rule, the invite flow and archiving. It is a
+`check.sh` proves RLS isolation, the tick and uncheck rules, the invite flow and archiving. It is a
 plain psql script, not pgTAP, so it lives outside `supabase/tests/` (where `supabase test db` looks).
 No hosted Supabase project exists yet. Magic-link emails from the local stack show up in Mailpit
 at http://127.0.0.1:54324.
 
 ### Sharp edges
 
-- **The database enforces README section 4's OR rule**, in the `guard_list_item` trigger. An update
-  that sets `checked = false` on a ticked item is silently kept at true, not rejected, so a slower
-  phone's queue still flushes. The server sets `checked_by`/`checked_at` and keeps whoever reached
-  it first. Undo (design call D5) is therefore client-only: drop the tick from the local queue
-  before it flushes.
+- **README section 4's OR rule is split between client and database.** The `guard_list_item` trigger
+  sets `checked_by`/`checked_at` and keeps whoever reached it first; `checked = false` unchecks.
+  The app only sends false for a tapped uncheck, filtered on the `checked_by` it was tapped on
+  (`syncNow` in `src/remote.ts`), so a late phone cannot un-buy a newer tick.
 - **Archived lists are frozen**: no edits to the list, its items or its invites, and no un-archiving.
   To re-run a trip, copy its items into a new list.
 - **Invites**: a member inserts `invites(list_id, email)`. The app then calls
