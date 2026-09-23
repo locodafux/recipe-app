@@ -79,6 +79,24 @@ Releases reuse one rolling `latest` GitHub Release tag, so "new build" is decide
 2. Bump `expo.version` in `app.json` so the installed version reads differently (optional for the sheet itself).
 3. `npm test` (`src/whatsnew.test.ts` checks the show-once rules and that ids are unique).
 
+## Releasing the APK (manual, no CI)
+
+The newest APK lives on the one rolling `latest` GitHub Release of `locodafux/recipe-app`. Built locally,
+no EAS account: the release build type signs with the debug keystore, and `/android` is generated and gitignored.
+
+```
+npx expo prebuild --platform android --no-install   # rewrites package.json scripts: git checkout package.json
+cd android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a
+# -> android/app/build/outputs/apk/release/app-release.apk, copy it to palengke-list.apk
+gh release create latest palengke-list.apk --latest -t "Latest build" -F notes.md   # first time only
+gh release upload latest palengke-list.apk --clobber && gh release edit latest --notes-file notes.md
+```
+
+- Re-run `prebuild` whenever `app.json` or native assets changed; a stale `/android` silently ignores them.
+- arm64-v8a only (about half the size): installs on real phones and the arm64 `Pixel_7a` emulator, not x86.
+- Notes = the top `CHANGELOG` entry's items in plain words, plus an "Android arm64 phones only" line.
+- Check `unzip -p <apk> assets/index.android.bundle | grep -c supabase.co` is non-zero, then delete the local APK.
+
 ## Shared list sync (M3)
 
 The app talks to the hosted project whose public URL and publishable key are defaults in `src/remote.ts`

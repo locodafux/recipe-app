@@ -3,7 +3,7 @@
     "name": "Palengke List",
     "slug": "recipe-app",
     "scheme": "recipe-app",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -11,6 +11,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.locodafux.palengkelist",
       "adaptiveIcon": {
         "backgroundColor": "#FAF5EA",
         "foregroundImage": "./assets/android-icon-foreground.png",
