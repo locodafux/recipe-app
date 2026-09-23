@@ -3,12 +3,12 @@
 // D4: bought items stay in place, struck through. D5 (revised): tap a ticked item to uncheck it.
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { byAisle, type Line } from '../merge.ts';
 import { flushArchives, useOnline, useSession } from '../remote.ts';
 import { finishShopping, toggleTick, useStore } from '../store.ts';
 import { firstName } from '../sync.ts';
-import { Button, C, Cta, Header, Section, s } from '../ui.tsx';
+import { Button, C, Cta, Header, Section, Sheet, s } from '../ui.tsx';
 import { Avatar, LineRow } from './LineRow.tsx';
 
 export function Shopping({ lines, onClose, onInvite }: { lines: Line[]; onClose: () => void; onInvite?: () => void }) {
@@ -48,12 +48,8 @@ export function Shopping({ lines, onClose, onInvite }: { lines: Line[]; onClose:
   };
   const below = unseen.filter((k) => (ys.current.get(k) ?? 0) > view.current.y).length;
 
-  const finish = () => {
-    const done = () => { finishShopping(lines); flushArchives(); onClose(); };
-    const msg = `${bought} of ${lines.length} bought. The trip moves to History${shared?.partner ? ' for both of you' : ''} and this list can no longer change.`;
-    if (Platform.OS === 'web') { if (window.confirm(`Finish shopping?\n${msg}`)) done(); return; }
-    Alert.alert('Finish shopping?', msg, [{ text: 'Keep shopping', style: 'cancel' }, { text: 'Finish', onPress: done }]);
-  };
+  const [finishing, setFinishing] = useState(false);
+  const finish = () => { setFinishing(false); finishShopping(lines); flushArchives(); onClose(); };
 
   return (
     <View style={s.screen}>
@@ -123,7 +119,15 @@ export function Shopping({ lines, onClose, onInvite }: { lines: Line[]; onClose:
           </Pressable>
         )}
       </View>
-      <Cta><Button small kind="secondary" title="Finish shopping" onPress={finish} /></Cta>
+      <Cta><Button small kind="secondary" title="Finish shopping" onPress={() => setFinishing(true)} /></Cta>
+      <Sheet visible={finishing} onClose={() => setFinishing(false)}>
+        <Text style={[s.h1, s.h1small]} accessibilityRole="header">Finish shopping?</Text>
+        <Text style={s.emptyText}>
+          {`${bought} of ${lines.length} bought. The trip moves to History${shared?.partner ? ' for both of you' : ''} and this list can no longer change.`}
+        </Text>
+        <Button title="Finish" onPress={finish} />
+        <Button kind="secondary" title="Keep shopping" onPress={() => setFinishing(false)} />
+      </Sheet>
     </View>
   );
 }

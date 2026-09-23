@@ -1,7 +1,7 @@
 // "Banig" design tokens and the shared pieces from the wireframes.
 import { Ionicons } from '@expo/vector-icons';
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import { Modal, Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
 import { AISLE_LABEL, type Aisle } from './merge.ts';
 
 export const C = {
@@ -90,6 +90,18 @@ export function Badge({ text, fg, bg }: { text: string; fg: string; bg: string }
 
 export function Cta({ children }: { children: ReactNode }) {
   return <View style={s.cta}>{children}</View>;
+}
+
+/** Bottom sheet for a confirmation. A tap outside or hardware back calls onClose, same as its cancel button. */
+export function Sheet({ visible, onClose, children }: { visible: boolean; onClose: () => void; children: ReactNode }) {
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <Pressable style={{ flex: 1, backgroundColor: 'rgba(31,26,19,0.35)' }} onPress={onClose} accessibilityLabel="Cancel" />
+      <View style={{ backgroundColor: C.paper, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20, paddingBottom: 28, gap: 10 }}>
+        {children}
+      </View>
+    </Modal>
+  );
 }
 
 export const s = StyleSheet.create({

@@ -1,13 +1,13 @@
 // Screen 6: History. 6A archived trips, newest first, each with Repeat; 6B the "Repeat this list?" sheet.
 // Tapping a trip shows what was bought, fully as it ended: ticked lines ticked, the rest not.
 import { useEffect, useMemo, useState } from 'react';
-import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { BY_ID, ID_BY_NAME, INDEX } from '../data.ts';
 import { dishSummary, repeatIds, tripDate, tripDishes, type Trip } from '../history.ts';
 import { byAisle, merge } from '../merge.ts';
 import { refreshHistory } from '../remote.ts';
 import { repeatTrip, useStore } from '../store.ts';
-import { Button, C, Cta, Header, Section, s } from '../ui.tsx';
+import { Button, C, Cta, Header, Section, Sheet, s } from '../ui.tsx';
 import { LineRow } from './LineRow.tsx';
 
 const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
@@ -82,22 +82,19 @@ function RepeatSheet({ trip, onClose, onRepeated }: { trip: Trip | null; onClose
   const n = useMemo(() => merge(ids.map((id) => BY_ID.get(id)!), INDEX).length, [ids]);
   const make = () => { repeatTrip(trip!, ID_BY_NAME); onClose(); onRepeated(); };
   return (
-    <Modal visible={trip != null} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={{ flex: 1, backgroundColor: 'rgba(31,26,19,0.35)' }} onPress={onClose} accessibilityLabel="Cancel" />
-      <View style={{ backgroundColor: C.paper, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20, paddingBottom: 28, gap: 10 }}>
-        <Text style={[s.h1, s.h1small]} accessibilityRole="header">Repeat this list?</Text>
-        {ids.length > 0 ? (
-          <Text style={s.emptyText}>
-            This makes a <Text style={{ fontWeight: '800', color: C.ink }}>new list</Text> with {plural(n, 'item')} from{' '}
-            {plural(ids.length, 'dish', 'dishes')} — nothing ticked, ready to buy again. The old trip will not change.
-            {week.length > 0 && ` It replaces the ${plural(week.length, 'dish', 'dishes')} on this week's list.`}
-          </Text>
-        ) : (
-          <Text style={s.emptyText}>None of this trip's dishes are in the recipe book any more, so there is nothing to repeat.</Text>
-        )}
-        {ids.length > 0 && <Button title="Make it a new list" onPress={make} />}
-        <Button kind="secondary" title="Cancel" onPress={onClose} />
-      </View>
-    </Modal>
+    <Sheet visible={trip != null} onClose={onClose}>
+      <Text style={[s.h1, s.h1small]} accessibilityRole="header">Repeat this list?</Text>
+      {ids.length > 0 ? (
+        <Text style={s.emptyText}>
+          This makes a <Text style={{ fontWeight: '800', color: C.ink }}>new list</Text> with {plural(n, 'item')} from{' '}
+          {plural(ids.length, 'dish', 'dishes')} — nothing ticked, ready to buy again. The old trip will not change.
+          {week.length > 0 && ` It replaces the ${plural(week.length, 'dish', 'dishes')} on this week's list.`}
+        </Text>
+      ) : (
+        <Text style={s.emptyText}>None of this trip's dishes are in the recipe book any more, so there is nothing to repeat.</Text>
+      )}
+      {ids.length > 0 && <Button title="Make it a new list" onPress={make} />}
+      <Button kind="secondary" title="Cancel" onPress={onClose} />
+    </Sheet>
   );
 }
