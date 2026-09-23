@@ -1,12 +1,12 @@
 // Screen 5: Shopping, a full-screen mode. Local-first ticks (README 4), shared with the partner when a list is.
 // D3: a partner's tick washes the row, then keeps an ube band and avatar; off-screen ones raise a pill.
-// D4: bought items stay in place, struck through. D5: undo only while the tick is still queued.
+// D4: bought items stay in place, struck through. D5 (revised): tap a ticked item to uncheck it.
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
 import { Alert, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { byAisle, type Line } from '../merge.ts';
 import { flushArchives, useOnline, useSession } from '../remote.ts';
-import { canUndo, finishShopping, tick, undo, useStore } from '../store.ts';
+import { finishShopping, toggleTick, useStore } from '../store.ts';
 import { firstName } from '../sync.ts';
 import { Button, C, Cta, Header, Section, s } from '../ui.tsx';
 import { Avatar, LineRow } from './LineRow.tsx';
@@ -99,18 +99,17 @@ export function Shopping({ lines, onClose, onInvite }: { lines: Line[]; onClose:
               <Section aisle={g.aisle} count={`${g.items.filter((l) => ticks[l.key]).length}/${g.items.length}`} />
               {g.items.map((l) => {
                 const t = ticks[l.key];
-                const undoable = canUndo(l.key);
                 return (
-                  <LineRow key={l.key} line={l} big checked={!!t} queued={undoable}
+                  <LineRow key={l.key} line={l} big checked={!!t} queued={t?.synced === false}
                     by={t?.by ? partner : undefined} fresh={fresh.has(l.key)}
                     onLayout={(e) => ys.current.set(l.key, (groupY.current.get(String(g.aisle)) ?? 0) + e.nativeEvent.layout.y)}
-                    onPress={!t ? () => tick(l.key) : undoable ? () => undo(l.key) : undefined}
-                    a11yHint={!t ? 'Marks it bought' : undoable ? 'Not sent yet, tap to undo' : 'Already shared, cannot be undone'} />
+                    onPress={() => toggleTick(l.key)}
+                    a11yHint={t ? 'Marks it not bought' : 'Marks it bought'} />
                 );
               })}
             </View>
           ))}
-          <Text style={[s.hint, { padding: 16 }]}>A tick can be undone while it is still queued on this phone.</Text>
+          <Text style={[s.hint, { padding: 16 }]}>Ticked by mistake? Tap it again to mark it not bought.</Text>
         </ScrollView>
         {unseen.length > 0 && (
           <Pressable onPress={() => scroller.current?.scrollTo({ y: Math.max(0, (ys.current.get(unseen[0]) ?? 0) - 60) })}

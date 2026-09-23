@@ -83,13 +83,22 @@ select pg_temp.eq((select checked_by from list_items where id = '22222222-0000-0
 select set_config('check.first_at', (select checked_at::text from list_items where id = '22222222-0000-0000-0000-000000000001'), true);
 select pg_temp.eq(current_setting('check.first_at') <> '', true, 'checked_at set');
 
--- Alice's slower phone flushes a stale "unchecked" and her own late tick: neither un-buys nor steals it.
+-- Alice's slower phone flushes an uncheck of her own earlier tick (the app scopes it by checked_by) and a
+-- late tick: neither un-buys Bob's tick nor steals it.
 select pg_temp.login('00000000-0000-0000-0000-00000000000a');
-update list_items set checked = false where id = '22222222-0000-0000-0000-000000000001';
+update list_items set checked = false where id = '22222222-0000-0000-0000-000000000001' and checked_by = auth.uid();
 update list_items set checked = true, checked_at = now() + interval '1 hour' where id = '22222222-0000-0000-0000-000000000001';
 update list_items set checked_by = null, checked_at = null where id = '22222222-0000-0000-0000-000000000001';
 select pg_temp.eq((select row(checked, checked_by, checked_at::text)::text from list_items where id = '22222222-0000-0000-0000-000000000001'),
   row(true, '00000000-0000-0000-0000-00000000000b'::uuid, current_setting('check.first_at'))::text, 'first tick is kept');
+-- D5 revised: a deliberate uncheck of the tick itself goes through and clears the checker; a new tick credits anew.
+select pg_temp.login('00000000-0000-0000-0000-00000000000b');
+update list_items set checked = false where id = '22222222-0000-0000-0000-000000000001' and checked_by = auth.uid();
+select pg_temp.eq((select row(checked, checked_by, checked_at)::text from list_items where id = '22222222-0000-0000-0000-000000000001'),
+  row(false, null::uuid, null::timestamptz)::text, 'uncheck clears the tick');
+update list_items set checked = true where id = '22222222-0000-0000-0000-000000000001';
+select pg_temp.eq((select checked_by from list_items where id = '22222222-0000-0000-0000-000000000001'),
+  '00000000-0000-0000-0000-00000000000b'::uuid, 're-tick credits the ticker');
 -- An unchecked item cannot carry a checker.
 update list_items set checked_by = auth.uid(), checked_at = now() where id = '22222222-0000-0000-0000-000000000002';
 select pg_temp.eq((select row(checked, checked_by, checked_at)::text from list_items where id = '22222222-0000-0000-0000-000000000002'),
@@ -139,5 +148,5 @@ select pg_temp.eq((select count(*) from list_items), 0::bigint, 'owner deleted c
 -- Realtime broadcasts list_items.
 select pg_temp.eq((select count(*) from pg_publication_tables where pubname = 'supabase_realtime' and tablename = 'list_items'), 1::bigint, 'list_items in realtime');
 
-\echo 'ok: RLS isolation, false->true ticks, invites, archiving and history all hold'
+\echo 'ok: RLS isolation, ticks and unchecks, invites, archiving and history all hold'
 rollback;

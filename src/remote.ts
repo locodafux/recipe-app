@@ -117,7 +117,7 @@ export async function ensureList(lines: Line[]) {
 
 let flushing = false;
 
-/** Pull the list's rows, then push queued ticks oldest first. Safe to call often. */
+/** Pull the list's rows, then push queued ticks and unchecks oldest first. Safe to call often. */
 export async function syncNow() {
   const shared = getState().shared;
   if (!supabase || !shared || flushing) return;
@@ -131,11 +131,15 @@ export async function syncNow() {
     if (items.error) throw items.error;
     if (list.data.archived_at) return closeArchived(shared.id, list.data.archived_at, items.data as Row[]);
     applyRows(shared.id, items.data as Row[]);
-    const sent = await flush(pendingTicks(), async (key) => {
-      const { error } = await supabase.from('list_items').update({ checked: true }).eq('list_id', shared.id).eq('item', key);
+    const sent = await flush(pendingTicks(), async (p) => {
+      let q = supabase.from('list_items').update({ checked: p.checked }).eq('list_id', shared.id).eq('item', p.key);
+      // An uncheck only undoes the tick it was tapped on. If someone else has bought the item since, it
+      // matches no row and the next fetch brings their tick back: a late phone cannot un-buy it (README 4).
+      if (!p.checked) q = q.eq('checked_by', p.by ?? shared.me);
+      const { error } = await q;
       if (error) throw error;
     });
-    markSynced(sent); // D5: these can no longer be undone
+    markSynced(sent);
     setOnline(pendingTicks().length === 0);
     if (!shared.partner) await findPartner(shared.id, shared.me);
   } catch (e) {
@@ -151,7 +155,7 @@ async function findPartner(listId: string, me: string) {
   if (p) setPartner({ id: p.accepted_by, email: p.email });
 }
 
-/** While a list is shared: realtime for the partner's ticks, and a retry loop for the queue. */
+/** While a list is shared: realtime for the partner's ticks and unchecks, and a retry loop for the queue. */
 export function useSync(listId: string | undefined) {
   useEffect(() => {
     if (!supabase || !listId) return;
