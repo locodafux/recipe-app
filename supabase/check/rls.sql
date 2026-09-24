@@ -138,15 +138,37 @@ insert into auth.users (id, email) values ('00000000-0000-0000-0000-00000000000c
 select pg_temp.login('00000000-0000-0000-0000-00000000000c');
 select pg_temp.fails($$select accept_invite(current_setting('check.carol_token')::uuid)$$, 'archived');
 
+-- Feedback: sent as yourself, read back with its status; nobody reads anyone else's or sets a status.
+select pg_temp.login('00000000-0000-0000-0000-00000000000b');
+insert into feedback (description, app_version, platform, os_version) values ('Let me add my own dish', '1.1.0', 'android', '34');
+select pg_temp.eq((select row(user_id, status)::text from feedback), row('00000000-0000-0000-0000-00000000000b'::uuid, 'open')::text, 'feedback is mine and open');
+select pg_temp.fails($$insert into feedback (description) values ('  ')$$, 'check constraint');
+select pg_temp.fails($$insert into feedback (description, user_id) values ('forged', '00000000-0000-0000-0000-00000000000a')$$, 'row-level security');
+select pg_temp.fails($$insert into feedback (description, status) values ('already done?', 'done')$$, 'row-level security');
+with u as (update feedback set status = 'done' returning 1)
+select pg_temp.eq((select count(*) from u), 0::bigint, 'sender sets status');
+with d as (delete from feedback returning 1)
+select pg_temp.eq((select count(*) from d), 0::bigint, 'sender deletes feedback');
+select pg_temp.login('00000000-0000-0000-0000-00000000000e');
+select pg_temp.eq((select count(*) from feedback), 0::bigint, 'eve sees others feedback');
+reset role;
+select set_config('role', 'anon', true);
+select pg_temp.fails($$insert into feedback (description) values ('anon')$$, 'row-level security');
+reset role;
+update feedback set status = 'planned'; -- outside the app (dashboard, service role)
+select pg_temp.login('00000000-0000-0000-0000-00000000000b');
+select pg_temp.eq((select status from feedback), 'planned', 'sender reads status');
+
 -- Deleting an account still cascades through archived lists (runs as the table owner, not an app user).
 reset role;
 delete from auth.users where id = '00000000-0000-0000-0000-00000000000b';
 select pg_temp.eq((select checked_by from list_items where id = '22222222-0000-0000-0000-000000000001'), null::uuid, 'checker deleted');
 delete from auth.users where id = '00000000-0000-0000-0000-00000000000a';
 select pg_temp.eq((select count(*) from list_items), 0::bigint, 'owner deleted cascades');
+select pg_temp.eq((select row(count(*), max(user_id::text))::text from feedback), row(1::bigint, null::text)::text, 'feedback survives its sender');
 
 -- Realtime broadcasts list_items.
 select pg_temp.eq((select count(*) from pg_publication_tables where pubname = 'supabase_realtime' and tablename = 'list_items'), 1::bigint, 'list_items in realtime');
 
-\echo 'ok: RLS isolation, ticks and unchecks, invites, archiving and history all hold'
+\echo 'ok: RLS isolation, ticks and unchecks, invites, archiving, history and feedback all hold'
 rollback;

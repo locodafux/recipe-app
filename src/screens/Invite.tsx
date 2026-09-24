@@ -104,7 +104,7 @@ export function Invite({ lines, onBack }: { lines: Line[]; onBack: () => void })
   );
 }
 
-function EmailForm({ title, help, button, error, sent, onSubmit }: {
+export function EmailForm({ title, help, button, error, sent, onSubmit }: {
   title: string; help: string; button: string; error: string | null; sent?: string | null; onSubmit: (email: string) => void;
 }) {
   const [email, setEmail] = useState('');

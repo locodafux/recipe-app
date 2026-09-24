@@ -5,10 +5,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient, type Session } from '@supabase/supabase-js';
 import * as Linking from 'expo-linking';
 import { useEffect, useState, useSyncExternalStore } from 'react';
-import { AppState } from 'react-native';
+import { AppState, Platform } from 'react-native';
+import app from '../app.json';
+import { CHANGELOG } from './changelog.ts';
 import { dishSummary, tripFromRows } from './history.ts';
 import type { Line } from './merge.ts';
-import { applyRows, archived, closeArchived, getState, markSynced, pendingTicks, setPartner, setRemoteHistory, setShared } from './store.ts';
+import { applyRows, archived, closeArchived, feedbackSent, getState, markSynced, pendingTicks, setFeedback, setPartner, setRemoteHistory, setShared, type Feedback } from './store.ts';
 import { firstName, flush, linesToRows, type Row } from './sync.ts';
 
 // The hosted project's public config. The publishable key is public by design (RLS guards the data);
@@ -25,7 +27,7 @@ export const supabase = URL_ && KEY
   : null;
 
 AppState.addEventListener('change', (s) => {
-  if (s === 'active') supabase?.auth.startAutoRefresh();
+  if (s === 'active') { supabase?.auth.startAutoRefresh(); flushFeedback(); }
   else supabase?.auth.stopAutoRefresh();
 });
 
@@ -204,6 +206,41 @@ export async function refreshHistory() {
   const { data, error } = await supabase.from('lists').select('id, archived_at, list_items(*)').not('archived_at', 'is', null);
   if (error) return console.warn('history failed', error.message);
   setRemoteHistory(data.map((l) => tripFromRows(l.id, l.archived_at!, l.list_items as Row[])));
+}
+
+// --- feedback ---
+
+let sendingFeedback = false;
+
+/**
+ * Sends feedback queued on this phone, oldest first, as the user who wrote it; offline or signed in as
+ * someone else, it stays queued for the next call (app start, back in the foreground, the Feedback screen).
+ */
+export async function flushFeedback() {
+  if (!supabase || sendingFeedback) return;
+  sendingFeedback = true;
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    for (const q of getState().outbox.filter((o) => o.by === session.user.id)) {
+      // ponytail: a reply lost after the insert landed sends it twice; add a client id if that shows up.
+      const { error } = await supabase.from('feedback').insert({ description: q.description,
+        app_version: `${app.expo.version} (${CHANGELOG[0]?.id})`, platform: Platform.OS, os_version: String(Platform.Version) });
+      if (error) return console.warn('feedback not sent', error.message);
+      feedbackSent(q);
+    }
+  } finally {
+    sendingFeedback = false;
+  }
+}
+
+/** Sends what is queued, then fetches what this user has sent, with its status. */
+export async function refreshFeedback() {
+  await flushFeedback();
+  const { error, data } = await supabase!.from('feedback').select('id, user_id, description, status, created_at')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  setFeedback(data as Feedback[]);
 }
 
 // --- invites (7A/7B/7C) ---
