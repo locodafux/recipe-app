@@ -12,6 +12,7 @@
     },
     "android": {
       "package": "com.locodafux.palengkelist",
+      "permissions": ["android.permission.REQUEST_INSTALL_PACKAGES"],
       "adaptiveIcon": {
         "backgroundColor": "#FAF5EA",
         "foregroundImage": "./assets/android-icon-foreground.png",
