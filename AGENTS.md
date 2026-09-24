@@ -122,6 +122,13 @@ with its unsent ticks; `flushArchives()` in `src/remote.ts` sends those ticks, t
 `syncNow()` notices when the partner archived the list and closes it on this phone. Rows keep dish
 names, not recipe ids, so Repeat looks dishes up by name (`ID_BY_NAME`).
 
+## Feedback
+
+`public.feedback` holds ideas and faults sent from the Feedback screen (button on the History header).
+It needs sign-in; written offline it queues in `outbox` (`src/store.ts`) until `flushFeedback()` in
+`src/remote.ts` sends it. Senders read their own rows back; `status` (open/planned/done) is set outside the
+app, from the dashboard, as work lands. No roles or admin screen; keep it that way.
+
 ## Shared-list backend (Supabase)
 
 `supabase/` is a Supabase CLI project. The schema is the migrations in `supabase/migrations/`;
@@ -133,7 +140,7 @@ supabase start && supabase db reset     # full local stack (needs Docker)
 DB_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres supabase/check/check.sh
 ```
 
-`check.sh` proves RLS isolation, the tick and uncheck rules, the invite flow and archiving. It is a
+`check.sh` proves RLS isolation, the tick and uncheck rules, the invite flow, archiving and feedback. It is a
 plain psql script, not pgTAP, so it lives outside `supabase/tests/` (where `supabase test db` looks).
 No hosted Supabase project exists yet. Magic-link emails from the local stack show up in Mailpit
 at http://127.0.0.1:54324.

@@ -27,10 +27,17 @@ type State = {
   seen?: string; // newest What's new entry shown (src/whatsnew.ts)
   history: Trip[]; // finished trips, newest first
   archiving: { id: string; ticks: string[] }[]; // shared lists finished offline: archive them, and these ticks, on reconnect
+  outbox: Queued[]; // feedback written offline, sent by remote.ts flushFeedback()
+  feedback: Feedback[]; // what this phone's user has sent, as last fetched, newest first
 };
 
+/** Feedback not yet sent. `by` is the user id it was written as, so it is never sent as someone else. */
+export type Queued = { at: number; by: string; description: string };
+/** A `feedback` row as its sender reads it back. The status is set outside the app. */
+export type Feedback = { id: string; user_id: string; description: string; status: 'open' | 'planned' | 'done'; created_at: string };
+
 const KEY = 'recipe-app/state/v1';
-let state: State = { week: [], ticks: {}, unticks: {}, shared: null, history: [], archiving: [] };
+let state: State = { week: [], ticks: {}, unticks: {}, shared: null, history: [], archiving: [], outbox: [], feedback: [] };
 const listeners = new Set<() => void>();
 
 function set(next: State) {
@@ -140,4 +147,17 @@ export function setRemoteHistory(trips: Trip[]) {
  */
 export function repeatTrip(trip: Trip, idByName: Map<string, string>) {
   set({ ...state, week: repeatIds(trip, idByName), ...(state.shared ? {} : { ticks: {}, unticks: {} }) });
+}
+
+/** Feedback goes on the phone first; remote.ts flushFeedback() sends it and takes it off the queue. */
+export function queueFeedback(by: string, description: string, at = Date.now()) {
+  set({ ...state, outbox: [...state.outbox, { at, by, description }] });
+}
+
+export function feedbackSent(q: Queued) {
+  set({ ...state, outbox: state.outbox.filter((o) => o !== q) });
+}
+
+export function setFeedback(feedback: Feedback[]) {
+  set({ ...state, feedback });
 }

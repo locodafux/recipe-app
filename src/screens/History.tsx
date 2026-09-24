@@ -1,5 +1,6 @@
 // Screen 6: History. 6A archived trips, newest first, each with Repeat; 6B the "Repeat this list?" sheet.
 // Tapping a trip shows what was bought, fully as it ended: ticked lines ticked, the rest not.
+import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { BY_ID, ID_BY_NAME, INDEX } from '../data.ts';
@@ -12,15 +13,23 @@ import { LineRow } from './LineRow.tsx';
 
 const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 
-export function History({ onOpen, onRepeated }: { onOpen: (id: string) => void; onRepeated: () => void }) {
+export function History({ onOpen, onRepeated, onFeedback }: { onOpen: (id: string) => void; onRepeated: () => void; onFeedback: () => void }) {
   const { history } = useStore();
   const [asking, setAsking] = useState<Trip | null>(null);
   useEffect(() => { refreshHistory(); }, []);
+  // The app has no settings screen; History is where "what you have done" lives, so Feedback sits here.
+  const feedback = (
+    <Pressable onPress={onFeedback} accessibilityRole="button" accessibilityLabel="Send feedback"
+      style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 6, paddingHorizontal: 11, height: 34, borderRadius: 10, backgroundColor: C.card, borderWidth: 1, borderColor: C.line }}>
+      <Ionicons name="chatbubble-ellipses-outline" size={17} color={C.dahon} />
+      <Text style={{ fontSize: 14, fontWeight: '700', color: C.dahon }}>Feedback</Text>
+    </Pressable>
+  );
 
   if (history.length === 0) {
     return (
       <View style={s.screen}>
-        <Header title="History" />
+        <Header title="History" right={feedback} />
         <View style={s.empty}>
           <Text style={{ fontSize: 40 }}>🧾</Text>
           <Text style={s.emptyText}>Finish a shopping trip and it is kept here, so next week you can repeat it.</Text>
@@ -31,7 +40,7 @@ export function History({ onOpen, onRepeated }: { onOpen: (id: string) => void; 
 
   return (
     <View style={s.screen}>
-      <Header title="History" sub={plural(history.length, 'trip')} />
+      <Header title="History" sub={plural(history.length, 'trip')} right={feedback} />
       <ScrollView contentContainerStyle={{ paddingBottom: 12 }}>
         {history.map((t) => {
           const dishes = tripDishes(t);
