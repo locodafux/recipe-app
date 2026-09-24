@@ -96,6 +96,9 @@ gh release upload latest palengke-list.apk --clobber && gh release edit latest -
 - arm64-v8a only (about half the size): installs on real phones and the arm64 `Pixel_7a` emulator, not x86.
 - Notes = the top `CHANGELOG` entry's items in plain words, plus an "Android arm64 phones only" line.
 - Check `unzip -p <apk> assets/index.android.bundle | grep -c supabase.co` is non-zero, then delete the local APK.
+- Installed phones learn of a new build from `UpdateBanner`: an APK asset uploaded to `latest` after the app's
+  install time counts as newer (`src/update.ts`). Keep the asset name `palengke-list.apk` and never compare
+  version strings; the rolling tag has none. Installing needs `REQUEST_INSTALL_PACKAGES` in `app.json`.
 
 ## Shared list sync (M3)
 

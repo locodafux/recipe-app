@@ -19,6 +19,7 @@ import { Join } from './src/screens/Join.tsx';
 import { ListTab, type Segment } from './src/screens/ListTab.tsx';
 import { RecipeDetail } from './src/screens/RecipeDetail.tsx';
 import { Shopping } from './src/screens/Shopping.tsx';
+import { UpdateBanner } from './src/screens/UpdateBanner.tsx';
 import { WhatsNew } from './src/screens/WhatsNew.tsx';
 import { hydrate, markSeen, useStore } from './src/store.ts';
 import { rowsToLines } from './src/sync.ts';
@@ -36,6 +37,7 @@ export default function App() {
       <SafeAreaView style={{ flex: 1, backgroundColor: C.paper }} edges={['top', 'left', 'right']}>
         {ready && <Main />}
         {ready && <News />}
+        <UpdateBanner />
       </SafeAreaView>
     </SafeAreaProvider>
   );
