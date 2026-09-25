@@ -21,6 +21,8 @@ export type Recipe = {
   servings: number | null;
   source: string;
   ingredients: Ingredient[];
+  /** Original steps, hand-written from method and this recipe's own ingredient list -- never scraped. */
+  steps: string[];
 };
 
 export type Part = { qty: number | null; unit: string | null };
