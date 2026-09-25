@@ -4,6 +4,14 @@ export type Entry = { id: string; title: string; items: string[] };
 
 export const CHANGELOG: Entry[] = [
   {
+    id: '2026-09-25',
+    title: 'Cook with confidence',
+    items: [
+      'Read written cooking instructions for every dish in the app.',
+      'See a notice when a newer app version is available to download.',
+    ],
+  },
+  {
     id: '2026-09-23',
     title: 'Plan the week, shop together',
     items: [
