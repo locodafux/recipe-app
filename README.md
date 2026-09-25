@@ -57,10 +57,11 @@ The pipeline is a **one-off build-time script**. It never ships in the app and t
 sitemaps → filter to wanted dishes → recipe-scrapers (wild_mode)
         → {name, servings, ingredients[]}
         → HAND-TAG the aisle field          ← the irreducible human work
+        → merge original steps from tools/steps.py
         → commit recipes.json
 ```
 
-**Only ingredient lists and dish names are taken** — not the prose, not the photos, not the instructions. US Copyright Office Circular 33 states plainly that *"a mere listing of ingredients or contents … is uncopyrightable"*, which is exactly and only the part a grocery list needs. Sources get credited in the app's About screen.
+**Only ingredient lists and dish names are taken from source pages** — not source prose, photos, or instructions. `tools/steps.py` contains original in-house cooking steps written from general method and the app's own ingredient list. US Copyright Office Circular 33 states plainly that *"a mere listing of ingredients or contents … is uncopyrightable"*, which is exactly the part a grocery list needs. Sources get credited in the app's About screen.
 
 TheMealDB stays as an explicit **"Search more recipes"** button from M2 — online-only, clearly marked, results imported into the local set, never the source of truth.
 
@@ -123,6 +124,10 @@ invites      id, list_id, email, token, accepted_at
     { "item": "gabi (taro)",         "label": "taro",       "qty": 250, "unit": "g",     "aisle": "gulay" },
     { "item": "kangkong",            "label": "kangkong",   "qty": 1,   "unit": "bunch", "aisle": "gulay" },
     { "item": "patis (fish sauce)",  "label": "fish sauce", "qty": 2,   "unit": "tbsp",  "aisle": "dry goods" }
+  ],
+  "steps": [
+    "Original cooking step written for this app.",
+    "Additional steps continue until the dish is ready."
   ]
 }
 ```
@@ -143,7 +148,7 @@ invites      id, list_id, email, token, accepted_at
 
 **Aisle order is dry before wet:** Vegetables → Dry goods → Fish & seafood → Meat. These are the section headers on the shopping list, in that order, so the fish and meat go in the bag last. `labels.json` lists aisles and categories in display order.
 
-Cooking steps are optional per recipe and can come later. The grocery list does not need them.
+Each recipe carries five to eight original cooking steps in English. The detail screen shows them below the ingredients, and the grocery list does not depend on them.
 
 ---
 
@@ -180,11 +185,11 @@ Merging resolves each ingredient to its canonical Filipino name **before** compa
 |---|-------------|
 | M0 | Folder, git repo, this README. ✅ |
 | M1 | Build-time scraper script + ~200 scraped recipes ingested to `recipes.json`, Filipino merge key, English display labels |
-| M2 | Expo app: browse, select, merged checklist. Supabase schema, magic-link invites, local-first ticking. TheMealDB "Search more" button |
+| M2 | Expo app: browse, recipe detail with ingredients and cooking steps, select, merged checklist. Supabase schema, magic-link invites, local-first ticking. TheMealDB "Search more" button |
 | M3 | Realtime sync between two phones, OR-merge on `checked`, offline queue and flush |
 | M4 | **Aisle-tagging pass** over the full catalogue + synonym map |
 | M5 | Archive + trip history, re-run a past list |
-| Later | Scale by servings, pantry ("already have it"), recipe photos, cooking steps |
+| Later | Scale by servings, pantry ("already have it"), recipe photos |
 
 ### M1 scope: "all the famous dishes in the Philippines"
 

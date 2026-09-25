@@ -29,9 +29,11 @@ To change the catalogue, edit the curated inputs and re-run — never patch the 
 
 ### Sharp edges
 
-- **Only dish names, servings and ingredient lines are ever taken** — no prose, no
-  steps, no photos. That boundary is what makes the data usable (US Copyright Office
-  Circular 33: a mere listing of ingredients is uncopyrightable). Keep it.
+- **Only dish names, servings and ingredient lines are ever taken from source pages**
+  — no source prose, source steps or photos. The app's cooking steps live in
+  `tools/steps.py` and are written in-house from cooking method and the app's own
+  ingredient list; they are not scraped. Keep those boundaries separate (US
+  Copyright Office Circular 33: a mere listing of ingredients is uncopyrightable).
 - **pepper.ph is unusable** despite having 761 recipe URLs: it renders ingredients
   client-side and ships zero `recipeIngredient` markup. yummy.ph and knorr.com/ph
   hard-block automated access. Working sources are panlasangpinoy.com,

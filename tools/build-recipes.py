@@ -4,11 +4,18 @@
 BUILD-TIME ONLY. Run by hand, commit the output. This never ships in the app and
 the app never calls it at runtime.
 
-Only dish names, servings and ingredient lines are taken -- never prose, never
-cooking steps, never photos. That boundary is the point: US Copyright Office
-Circular 33 states a mere listing of ingredients is uncopyrightable, and an
-ingredient list is the only part a grocery list needs. Every recipe records its
-source URL so the app can credit it.
+Only dish names, servings and ingredient lines are ever taken from a source page
+-- never prose, never cooking steps, never photos. That boundary is the point:
+US Copyright Office Circular 33 states a mere listing of ingredients is
+uncopyrightable, and an ingredient list is the only part a grocery list needs.
+Every recipe records its source URL so the app can credit it.
+
+Cooking steps do come from somewhere, though: tools/steps.py, hand-written
+in-house from method and this catalogue's own ingredient lists, never scraped
+and never read off a source page while writing (see AGENTS.md and
+tools/check_steps.py). This function only merges STEPS.get(id) into the recipe
+it already built from scraped ingredients -- the "never taken from a source"
+rule above still governs every field this script itself produces.
 
 Usage:
     uv run --with recipe-scrapers --with requests tools/build-recipes.py
@@ -27,6 +34,7 @@ import requests
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from dishes import CATEGORIES, DISHES, OVERRIDES  # noqa: E402
 from parse import parse_line       # noqa: E402
+from steps import STEPS             # noqa: E402
 from vocab import AISLES, AISLE_KEYWORDS, DROP, LABELS, VOCAB  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -259,7 +267,8 @@ def main():
             continue
         recipes.append({"id": r["id"], "name": r["name"], "alt": r["alt"],
                         "category": r["category"], "servings": r["servings"],
-                        "source": r["source"], "ingredients": ings})
+                        "source": r["source"], "ingredients": ings,
+                        "steps": STEPS.get(r["id"], [])})
 
     (DATA / "recipes.json").write_text(
         json.dumps(recipes, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")

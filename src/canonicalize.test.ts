@@ -56,6 +56,7 @@ test('normalize is case and punctuation insensitive', () => {
 const recipe = (name: string, ingredients: [string, number | null, string | null][]): Recipe => ({
   id: name, name, alt: [], category: 'sabaw', servings: 4, source: '',
   ingredients: ingredients.map(([item, qty, unit]) => ({ item, qty, unit, aisle: 'gulay' })),
+  steps: [],
 });
 
 test('same unit adds, different units are shown both ways (README 6)', () => {

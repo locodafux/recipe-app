@@ -32,8 +32,19 @@ export function RecipeDetail({ id, onBack }: { id: string; onBack: () => void })
             ))}
           </View>
         ))}
+        {r.steps.length > 0 && (
+          <View>
+            <Section label="Steps" count={r.steps.length} />
+            {r.steps.map((step, k) => (
+              <View key={k} style={[s.row, { minHeight: 0, alignItems: 'flex-start', paddingVertical: 12 }, k === 0 && { borderTopWidth: 1, borderTopColor: C.line }]}>
+                <Text style={[s.qty, { fontSize: 15, width: 22 }]}>{k + 1}</Text>
+                <View style={s.main}><Text style={[s.nm, { fontWeight: '400', lineHeight: 22 }]}>{step}</Text></View>
+              </View>
+            ))}
+          </View>
+        )}
         <Text style={[s.mt, { padding: 16, fontSize: 12.5, lineHeight: 18 }]}>
-          Ingredient list from {host}. No photos or steps copied — ingredients only.
+          Ingredient list from {host}. Steps are written for this app, not copied from any source.
         </Text>
       </ScrollView>
       <Cta>
